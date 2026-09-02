@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { RegisterOtpDto } from './dto/register-otp.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { MailService } from '../mail/mail.service.js';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,23 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
+
+  // Fetch the logged-in user profile, omitting security credentials
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User profile does not exist.');
+    }
+
+    // Strip sensitive hashes before sending back to client
+    const { passwordHash: _, refreshTokenHash: __, ...result } = user;
+    return result;
+  }
 
   // Generate and send a 6-digit OTP code
   async sendOtp(email: string, purpose: string): Promise<void> {
@@ -28,7 +45,7 @@ export class AuthService {
       },
     });
 
-    this.logger.log(`[EMAIL DISPATCH] To: ${email} | Subject: Your OTP Code is ${code} (Expires in 5 minutes)`);
+    await this.mailService.sendOtpEmail(email, code, purpose);
   }
 
   // Register user after validating OTP
@@ -78,6 +95,10 @@ export class AuthService {
 
     if (!user.isEmailVerified) {
       throw new BadRequestException('Email has not been verified yet.');
+    }
+
+    if (!user.passwordHash) {
+      throw new UnauthorizedException('This account was registered using Google. Please log in with Google.');
     }
 
     const isMatch = await bcrypt.compare(pass, user.passwordHash);
@@ -184,6 +205,42 @@ export class AuthService {
         where: { id: validOtp.id }
       })
     ]);
+  }
+
+  // Handle Google Login / Registration
+  async validateOAuthUser(profile: { email: string; firstName: string; lastName: string }) {
+    const email = profile.email.toLowerCase();
+    
+    // 1. Check if user already exists
+    let user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    // 2. If user does not exist, create a new one (Auto-registration)
+    if (!user) {
+      const fullName = `${profile.firstName} ${profile.lastName}`.trim();
+      user = await this.prisma.user.create({
+        data: {
+          email,
+          name: fullName || 'Google User',
+          role: 'customer',
+          isEmailVerified: true, // Google already verified their ownership of the email
+        },
+      });
+    }
+
+    // 3. Generate internal Auth & Refresh Tokens
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
+
+    // 4. Update internal refresh token hash in DB
+    await this.updateRefreshTokenHash(user.id, tokens.refreshToken);
+
+    const { passwordHash: _, refreshTokenHash: __, ...userResponse } = user;
+
+    return {
+      ...tokens,
+      user: userResponse,
+    };
   }
 
   private async updateRefreshTokenHash(userId: string, refreshToken: string): Promise<void> {

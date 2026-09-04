@@ -1,4 +1,5 @@
 import { Controller, Post, Body, Res, Req, UseGuards, UnauthorizedException, Get, InternalServerErrorException } from '@nestjs/common';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { AuthGuard } from '@nestjs/passport';
 import type { Response, Request } from 'express';
 import { AuthService } from './auth.service.js';
@@ -15,17 +16,20 @@ import { ApiTags } from '@nestjs/swagger';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseGuards(ThrottlerGuard)
   @Post('otp/send')
   async sendOtp(@Body() sendOtpDto: SendOtpDto) {
     await this.authService.sendOtp(sendOtpDto.email, sendOtpDto.purpose);
     return { message: 'OTP code has been sent successfully to your email.' };
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('register')
   async register(@Body() registerDto: RegisterOtpDto) {
     return this.authService.registerWithOtp(registerDto);
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('login')
   async login(
     @Body() loginDto: LoginDto,
@@ -89,6 +93,7 @@ export class AuthController {
     return this.authService.getProfile(user?.id);
   }
 
+  @UseGuards(ThrottlerGuard)
   @Post('password/forgot')
   async forgotPassword(@Body() dto: ForgotPasswordDto) {
     await this.authService.forgotPassword(dto.email);

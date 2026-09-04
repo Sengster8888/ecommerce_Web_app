@@ -8,6 +8,7 @@ import { MailModule } from './mail/mail.module.js';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CategoriesModule } from './categories/categories.module.js';
 import { ProductsModule } from './products/products.module.js';
+import { CartsModule } from './carts/carts.module.js';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { ProductsModule } from './products/products.module.js';
     AuthModule,
     MailModule,
     CategoriesModule,
-    ProductsModule
+    ProductsModule,
+    CartsModule
   ],
   controllers: [AppController],
   providers: [AppService],

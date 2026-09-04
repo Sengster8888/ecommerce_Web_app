@@ -3,6 +3,7 @@ import { AppModule } from './app.module.js';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import { BigIntSerializerInterceptor } from './common/interceptors/bigint-serializer.interceptor.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +13,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
   }));
+  app.useGlobalInterceptors(new BigIntSerializerInterceptor());
 
   const config = new DocumentBuilder()
     .setTitle('E-Commerce API')

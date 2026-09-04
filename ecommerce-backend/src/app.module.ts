@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module.js';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module.js';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { CategoriesModule } from './categories/categories.module.js';
+import { ProductsModule } from './products/products.module.js';
 
 @Module({
   imports: [
@@ -16,7 +18,9 @@ import { ThrottlerModule } from '@nestjs/throttler';
     }]),
     HealthModule, 
     AuthModule,
-    MailModule
+    MailModule,
+    CategoriesModule,
+    ProductsModule
   ],
   controllers: [AppController],
   providers: [AppService],

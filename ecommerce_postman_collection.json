@@ -22,7 +22,7 @@
 			"name": "1. Authentication",
 			"item": [
 				{
-					"name": "Send OTP (Register)",
+					"name": "Step 1 - Submit Registration Form (Sends OTP)",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -33,34 +33,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"user@example.com\",\n  \"purpose\": \"REGISTER\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/auth/otp/send",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"otp",
-								"send"
-							]
-						}
-					}
-				},
-				{
-					"name": "Register User",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"user@example.com\",\n  \"otp\": \"123456\",\n  \"password\": \"Password123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+							"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123!\",\n  \"phone\": \"012345678\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/register",
@@ -70,6 +43,32 @@
 							"path": [
 								"auth",
 								"register"
+							]
+						}
+					}
+				},
+				{
+					"name": "Step 2 - Verify OTP & Create Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"user@example.com\",\n  \"otpCode\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/verify-otp",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"verify-otp"
 							]
 						}
 					}

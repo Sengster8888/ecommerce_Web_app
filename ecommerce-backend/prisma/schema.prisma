@@ -249,6 +249,7 @@ model OtpVerification {
   email     String   @db.VarChar(255)
   code      String   @db.VarChar(6) // 6-digit verification code
   purpose   String   @db.VarChar(30) // 'REGISTER_VERIFY', 'LOGIN_MFA', 'PASSWORD_RESET'
+  payload   String?  @db.Text // Stores pending user registration payload (name, phone, passwordHash)
   expiresAt DateTime @map("expires_at") @db.Timestamp
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp
 

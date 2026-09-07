@@ -4,7 +4,8 @@ import { AuthGuard } from '@nestjs/passport';
 import type { Response, Request } from 'express';
 import { AuthService } from './auth.service.js';
 import { SendOtpDto } from './dto/send-otp.dto.js';
-import { RegisterOtpDto } from './dto/register-otp.dto.js';
+import { RegisterDto } from './dto/register.dto.js';
+import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
@@ -25,8 +26,14 @@ export class AuthController {
 
   @UseGuards(ThrottlerGuard)
   @Post('register')
-  async register(@Body() registerDto: RegisterOtpDto) {
-    return this.authService.registerWithOtp(registerDto);
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.initiateRegistration(registerDto);
+  }
+
+  @UseGuards(ThrottlerGuard)
+  @Post('verify-otp')
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
+    return this.authService.verifyRegistrationOtp(verifyOtpDto);
   }
 
   @UseGuards(ThrottlerGuard)

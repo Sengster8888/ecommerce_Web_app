@@ -2,7 +2,8 @@ import { Injectable, BadRequestException, UnauthorizedException, Logger, NotFoun
 import { PrismaService } from '../prisma/prisma.service.js';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { RegisterOtpDto } from './dto/register-otp.dto.js';
+import { RegisterDto } from './dto/register.dto.js';
+import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { MailService } from '../mail/mail.service.js';
 
@@ -48,8 +49,50 @@ export class AuthService {
     await this.mailService.sendOtpEmail(email, code, purpose);
   }
 
-  // Register user after validating OTP
-  async registerWithOtp(dto: RegisterOtpDto) {
+  // Step 1: Initiate registration form submission (validates, hashes password, saves payload & emails OTP)
+  async initiateRegistration(dto: RegisterDto) {
+    const existingUser = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    if (existingUser) {
+      throw new BadRequestException('User with this email already exists.');
+    }
+
+    const name = dto.name || [dto.firstName, dto.lastName].filter(Boolean).join(' ') || 'User';
+    const passwordHash = await bcrypt.hash(dto.password, 12);
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    const payload = JSON.stringify({
+      name,
+      email: dto.email,
+      phone: dto.phone,
+      passwordHash,
+    });
+
+    // Remove any previous registration OTPs for this email to avoid state pollution
+    await this.prisma.otpVerification.deleteMany({
+      where: { email: dto.email, purpose: 'REGISTER_VERIFY' },
+    });
+
+    await this.prisma.otpVerification.create({
+      data: {
+        email: dto.email,
+        code,
+        purpose: 'REGISTER_VERIFY',
+        payload,
+        expiresAt,
+      },
+    });
+
+    await this.mailService.sendOtpEmail(dto.email, code, 'REGISTER_VERIFY');
+
+    return {
+      message: 'Registration form submitted successfully. An OTP code has been sent to your email.',
+      email: dto.email,
+    };
+  }
+
+  // Step 2: Verify OTP code and create account in database
+  async verifyRegistrationOtp(dto: VerifyOtpDto) {
     const validOtp = await this.prisma.otpVerification.findFirst({
       where: {
         email: dto.email,
@@ -59,7 +102,7 @@ export class AuthService {
       },
     });
 
-    if (!validOtp) {
+    if (!validOtp || !validOtp.payload) {
       throw new BadRequestException('Invalid or expired OTP code.');
     }
 
@@ -68,13 +111,14 @@ export class AuthService {
       throw new BadRequestException('User with this email already exists.');
     }
 
-    const passwordHash = await bcrypt.hash(dto.password, 12);
+    const pendingUser = JSON.parse(validOtp.payload);
+
     const newUser = await this.prisma.user.create({
       data: {
-        name: dto.name,
-        email: dto.email,
-        phone: dto.phone,
-        passwordHash,
+        name: pendingUser.name,
+        email: pendingUser.email,
+        phone: pendingUser.phone,
+        passwordHash: pendingUser.passwordHash,
         role: 'customer',
         isEmailVerified: true,
       },
@@ -82,8 +126,11 @@ export class AuthService {
 
     await this.prisma.otpVerification.delete({ where: { id: validOtp.id } });
 
-    const { passwordHash: _, ...result } = newUser;
-    return result;
+    const { passwordHash: _, refreshTokenHash: __, ...result } = newUser;
+    return {
+      message: 'Account created successfully.',
+      user: result,
+    };
   }
 
   // Verify credentials and return signed access & refresh tokens

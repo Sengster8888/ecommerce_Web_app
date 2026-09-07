@@ -13,6 +13,7 @@ import { OrdersModule } from './orders/orders.module.js';
 import { AdminOrdersModule } from './admin-orders/admin-orders.module.js';
 import { TelegramModule } from './telegram/telegram.module.js';
 import { PaymentsModule } from './payments/payments.module.js';
+import { OrderTrackingModule } from './order-tracking/order-tracking.module.js';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PaymentsModule } from './payments/payments.module.js';
     AdminOrdersModule,
     TelegramModule,
     PaymentsModule,
+    OrderTrackingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

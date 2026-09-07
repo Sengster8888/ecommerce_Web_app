@@ -658,6 +658,76 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "6. Order Tracking",
+			"item": [
+				{
+					"name": "Get Order Tracking Timeline",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/1/tracking",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"1",
+								"tracking"
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Admin Tracking Note (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"note\": \"Package picked up by courier. In transit.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/1/tracking-notes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"orders",
+								"1",
+								"tracking-notes"
+							]
+						}
+					}
+				}
+			]
 		}
 	]
 }

@@ -20,7 +20,7 @@ export class TelegramService {
   }
 
   /**
-   * Generates a beautifully formatted HTML message template for new orders
+   * Generates a formatted HTML notification message for incoming/confirmed orders
    * and dispatches it to the admin Telegram chat.
    */
   async sendNewOrderNotification(orderId: bigint): Promise<void> {
@@ -50,9 +50,9 @@ export class TelegramService {
       const addressString = `${addr.streetLine}, ${addr.commune}, ${addr.city}, ${addr.province}`;
 
       // 3. Construct HTML Notification String
-      const isManualReview = order.status === 'PENDING';
-      const titleEmoji = isManualReview ? '🛒' : '✅';
-      const statusText = isManualReview ? 'PENDING (Needs Review)' : 'CONFIRMED (Auto)';
+      const isConfirmed = order.status === 'CONFIRMED';
+      const titleEmoji = isConfirmed ? '✅' : '🛒';
+      const statusText = isConfirmed ? 'CONFIRMED (Auto)' : 'PENDING (Awaiting Payment)';
 
       let message = `${titleEmoji} <b>NEW ORDER REGISTERED</b>\n`;
       message += `--------------------------------------\n`;
@@ -72,36 +72,20 @@ export class TelegramService {
       message += `--------------------------------------\n`;
       message += `<b>Total Amount:</b> <code>$${Number(order.totalAmount).toFixed(2)}</code>\n\n`;
 
-      // 4. Construct appropriate keyboard actions
-      let inlineKeyboard = [];
-      if (isManualReview) {
-        message += `💡 <i>An administrator must verify stock levels and manual payment before confirming this order.</i>`;
-        inlineKeyboard = [
-          [
-            { text: '✅ Confirm Order', callback_data: `confirm:${order.id.toString()}` },
-            { text: '❌ Reject Order', callback_data: `reject:${order.id.toString()}` },
-          ],
-        ];
+      if (isConfirmed) {
+        message += `💡 <i>Order auto-confirmed. Stock check, order creation, and stock update performed atomically in a single database transaction.</i>`;
       } else {
-        message += `💡 <i>Stock has been decremented and the order is auto-confirmed. Tap below only to cancel under emergency conditions.</i>`;
-        inlineKeyboard = [
-          [
-            { text: '🚨 Cancel Order', callback_data: `cancel:${order.id.toString()}` },
-          ],
-        ];
+        message += `💡 <i>Order registered and stock reserved. Awaiting customer payment.</i>`;
       }
 
-      // 5. Send message via Telegram Bot HTTP API
+      // 4. Send message via Telegram Bot HTTP API without manual action buttons
       const response = await axios.post(`${this.baseUrl}/sendMessage`, {
         chat_id: this.adminChatId,
         text: message,
         parse_mode: 'HTML',
-        reply_markup: {
-          inline_keyboard: inlineKeyboard,
-        },
       });
 
-      // 6. Log transaction successfully in database
+      // 5. Log transaction successfully in database
       if (response.data?.ok) {
         const telegramMessageId = response.data.result.message_id.toString();
         await this.prisma.telegramMessage.create({
@@ -109,7 +93,7 @@ export class TelegramService {
             orderId: order.id,
             telegramChatId: this.adminChatId,
             telegramMessageId,
-            messageType: isManualReview ? 'NEW_ORDER_REVIEW' : 'NEW_ORDER_AUTO',
+            messageType: isConfirmed ? 'NEW_ORDER_CONFIRMED' : 'NEW_ORDER_PENDING',
             status: 'SENT',
             sentAt: new Date(),
           },
@@ -137,7 +121,7 @@ export class TelegramService {
   }
 
   /**
-   * Modifies an existing message in the chat, removing buttons and writing status updates
+   * Modifies an existing message in the chat, writing status updates
    */
   async editTelegramMessage(chatId: string, messageId: string, newText: string): Promise<void> {
     if (!this.botToken) return;
@@ -147,7 +131,6 @@ export class TelegramService {
         message_id: parseInt(messageId, 10),
         text: newText,
         parse_mode: 'HTML',
-        reply_markup: { inline_keyboard: [] }, // Clear actions to prevent duplicate inputs
       });
     } catch (error: any) {
       this.logger.error(`Failed to edit message ${messageId}: ${error.message}`);
@@ -156,7 +139,6 @@ export class TelegramService {
 
   /**
    * Notifies Telegram client that the webhook callback query was received successfully
-   * (Removes the loading spinner from the user's screen)
    */
   async answerCallback(callbackQueryId: string, alertText: string): Promise<void> {
     if (!this.botToken) return;

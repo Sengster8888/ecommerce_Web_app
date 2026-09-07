@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { OrdersService } from './orders.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { TelegramService } from '../telegram/telegram.service.js';
 import { vi } from 'vitest';
 
 describe('Order Creation Concurrency (Race Condition Test)', () => {
@@ -9,7 +10,16 @@ describe('Order Creation Concurrency (Race Condition Test)', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [OrdersService, PrismaService],
+      providers: [
+        OrdersService, 
+        PrismaService,
+        {
+          provide: TelegramService,
+          useValue: {
+            sendOrderNotification: vi.fn().mockResolvedValue(true),
+          },
+        },
+      ],
     }).compile();
 
     ordersService = moduleRef.get<OrdersService>(OrdersService);

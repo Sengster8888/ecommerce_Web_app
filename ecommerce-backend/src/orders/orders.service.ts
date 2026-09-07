@@ -92,8 +92,8 @@ export class OrdersService {
         });
       }
 
-      // Calculate flat rates/fees (e.g., $1.50 shipping fee)
-      const shippingFee = 1.50; 
+      // Calculate flat rates/fees (Free Shipping: $0.00)
+      const shippingFee = 0.00; 
       const totalAmount = subtotal + shippingFee;
 
       // Generate a human-readable order number (ORD-YYYYMMDD-XXXX)
@@ -154,7 +154,9 @@ export class OrdersService {
 
     // 8. Outbound async notification (Safely executed outside of DB transactions)
     try {
-      this.telegramService.sendNewOrderNotification(newOrder.id);
+      if (newOrder.paymentMethod === PaymentMethod.COD) {
+        this.telegramService.sendNewOrderNotification(newOrder.id);
+      }
     } catch (error: any) {
       this.logger.error(`Telegram notification failed to trigger: ${error.message}`);
     }

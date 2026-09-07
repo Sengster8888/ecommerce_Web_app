@@ -12,6 +12,7 @@ import { CartsModule } from './carts/carts.module.js';
 import { OrdersModule } from './orders/orders.module.js';
 import { AdminOrdersModule } from './admin-orders/admin-orders.module.js';
 import { TelegramModule } from './telegram/telegram.module.js';
+import { PaymentsModule } from './payments/payments.module.js';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { TelegramModule } from './telegram/telegram.module.js';
     CartsModule,
     OrdersModule,
     AdminOrdersModule,
-    TelegramModule
+    TelegramModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

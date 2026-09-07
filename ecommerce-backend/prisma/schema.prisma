@@ -194,6 +194,9 @@ model Payment {
   status            String    @db.VarChar(20) // PENDING / PAID / FAILED / REFUNDED
   amount            Decimal   @db.Decimal(12, 2)
   providerReference String?   @map("provider_reference") @db.VarChar(100) // External Bank Transaction ID
+  md5               String?   @db.VarChar(32) // Hash used by Bakong to identify and verify the transaction
+  qrString          String?   @map("qr_string") @db.Text // Raw EMVCo payload string cached for reuse
+  expiresAt         DateTime? @map("expires_at") @db.Timestamp // Time window indicating when the QR code invalidates
   paidAt            DateTime? @map("paid_at") @db.Timestamp
   createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamp
   updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamp

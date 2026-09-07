@@ -395,6 +395,269 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "4. Payments",
+			"item": [
+				{
+					"name": "Initiate / Retrieve Payment (KHQR)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": \"1\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Payment Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Simulate Webhook Callback",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"providerReference\": \"TXN-KHQR-1-1757258000000\",\n  \"status\": \"PAID\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments/1/simulate-webhook",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"1",
+								"simulate-webhook"
+							]
+						}
+					}
+				},
+				{
+					"name": "Capture COD Payment (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/1/capture",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"1",
+								"capture"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Admin Orders",
+			"item": [
+				{
+					"name": "Get Dashboard Stats (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/orders/dashboard/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"orders",
+								"dashboard",
+								"stats"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Orders (Filtered & Paginated)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/orders?page=1&limit=10&status=PENDING",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "PENDING"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Admin Order Detail",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/orders/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"orders",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Order Status (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"PROCESSING\",\n  \"note\": \"Order confirmed and moved to processing by admin.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/orders/1/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"orders",
+								"1",
+								"status"
+							]
+						}
+					}
+				}
+			]
 		}
 	]
 }

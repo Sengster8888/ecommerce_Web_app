@@ -1,10 +1,16 @@
-import { Injectable, BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, ConflictException, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CheckoutDto, PaymentMethod } from './dto/checkout.dto.js';
+import { TelegramService } from '../telegram/telegram.service.js';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(OrdersService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly telegramService: TelegramService,
+  ) {}
 
   async checkout(userId: string, dto: CheckoutDto) {
     const addressId = BigInt(dto.addressId);
@@ -32,7 +38,7 @@ export class OrdersService {
     }
 
     // 3. Begin Interactive Prisma Transaction
-    return this.prisma.$transaction(async (tx) => {
+    const newOrder = await this.prisma.$transaction(async (tx) => {
       let subtotal = 0;
 
       // Track items and verified stock updates
@@ -145,6 +151,15 @@ export class OrdersService {
 
       return order;
     });
+
+    // 8. Outbound async notification (Safely executed outside of DB transactions)
+    try {
+      this.telegramService.sendNewOrderNotification(newOrder.id);
+    } catch (error: any) {
+      this.logger.error(`Telegram notification failed to trigger: ${error.message}`);
+    }
+
+    return newOrder;
   }
 
   // --- QUERY UTILITIES ---

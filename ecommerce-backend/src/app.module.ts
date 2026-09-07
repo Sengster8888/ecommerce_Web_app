@@ -11,6 +11,7 @@ import { ProductsModule } from './products/products.module.js';
 import { CartsModule } from './carts/carts.module.js';
 import { OrdersModule } from './orders/orders.module.js';
 import { AdminOrdersModule } from './admin-orders/admin-orders.module.js';
+import { TelegramModule } from './telegram/telegram.module.js';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { AdminOrdersModule } from './admin-orders/admin-orders.module.js';
     ProductsModule,
     CartsModule,
     OrdersModule,
-    AdminOrdersModule
+    AdminOrdersModule,
+    TelegramModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -144,6 +144,304 @@
 			]
 		},
 		{
+			"name": "2. Categories",
+			"item": [
+				{
+					"name": "Get Category Tree (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Category By ID (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/categories/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Category (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Laptops & Computers\",\n  \"slug\": \"laptops-computers\",\n  \"imageUrl\": \"https://images.unsplash.com/photo-1517336714731-489689fd1ca8\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Category (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Laptops, Computers & Tech Gadgets\",\n  \"slug\": \"laptops-computers-tech-gadgets\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/categories/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Category (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/categories/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"categories",
+								"1"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Products Catalog",
+			"item": [
+				{
+					"name": "List Products (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products?page=1&limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Product By Slug (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/slug/apple-macbook-pro-16-m3-max",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"slug",
+								"apple-macbook-pro-16-m3-max"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Product By ID (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Product (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"categoryId\": \"1\",\n  \"name\": \"Apple MacBook Pro 16-inch M3 Max\",\n  \"slug\": \"apple-macbook-pro-16-m3-max\",\n  \"description\": \"Apple M3 Max chip with 16-core CPU and 40-core GPU, 48GB Unified Memory, 1TB SSD storage, Liquid Retina XDR display.\",\n  \"price\": 3499.00,\n  \"stock\": 15,\n  \"status\": \"active\",\n  \"images\": [\n    {\n      \"imageUrl\": \"https://images.unsplash.com/photo-1517336714731-489689fd1ca8\",\n      \"isPrimary\": true,\n      \"sortOrder\": 0\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Product (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": 3399.00,\n  \"stock\": 20\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Product (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/products/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"1"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
 			"name": "2. Shopping Cart",
 			"item": [
 				{
@@ -722,6 +1020,295 @@
 								"orders",
 								"1",
 								"tracking-notes"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Discounts & Promo Codes",
+			"item": [
+				{
+					"name": "1. Validate Discount / Promo Code (Customer)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"WELCOME10\",\n  \"cartSubtotal\": 100.00,\n  \"cartItems\": [\n    {\n      \"productId\": \"1\",\n      \"categoryId\": \"1\",\n      \"unitPrice\": 50.00,\n      \"quantity\": 2\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/discounts/validate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"discounts",
+								"validate"
+							]
+						}
+					}
+				},
+				{
+					"name": "2. Create Promo Code Discount (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Welcome Coupon\",\n  \"description\": \"10% off for new users at checkout\",\n  \"type\": \"PERCENTAGE\",\n  \"scope\": \"PROMO_CODE\",\n  \"value\": 10.00,\n  \"maxDiscountAmount\": 50.00,\n  \"minimumOrderAmount\": 20.00,\n  \"code\": \"WELCOME10\",\n  \"startDate\": \"2026-01-01T00:00:00.000Z\",\n  \"endDate\": \"2026-12-31T23:59:59.000Z\",\n  \"usageLimit\": 1000,\n  \"usageLimitPerUser\": 1,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/discounts/admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"discounts",
+								"admin"
+							]
+						}
+					}
+				},
+				{
+					"name": "3. Create Store-Wide Automatic Discount (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Khmer New Year Storewide Sale\",\n  \"description\": \"Automatic 15% off all products\",\n  \"type\": \"PERCENTAGE\",\n  \"scope\": \"ALL_PRODUCTS\",\n  \"value\": 15.00,\n  \"minimumOrderAmount\": 10.00,\n  \"startDate\": \"2026-01-01T00:00:00.000Z\",\n  \"endDate\": \"2026-12-31T23:59:59.000Z\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/discounts/admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"discounts",
+								"admin"
+							]
+						}
+					}
+				},
+				{
+					"name": "4. Create Product-Specific Discount (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"MacBook Pro Special Deal\",\n  \"description\": \"$100 off MacBook Pro\",\n  \"type\": \"FIXED_AMOUNT\",\n  \"scope\": \"SPECIFIC_PRODUCTS\",\n  \"value\": 100.00,\n  \"productIds\": [\"1\"],\n  \"startDate\": \"2026-01-01T00:00:00.000Z\",\n  \"endDate\": \"2026-12-31T23:59:59.000Z\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/discounts/admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"discounts",
+								"admin"
+							]
+						}
+					}
+				},
+				{
+					"name": "5. List All Discounts (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/discounts/admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"discounts",
+								"admin"
+							]
+						}
+					}
+				},
+				{
+					"name": "6. Update Discount (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"value\": 15.00,\n  \"usageLimit\": 2000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/discounts/admin/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"discounts",
+								"admin",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "7. Delete Discount (Admin Only)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/discounts/admin/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"discounts",
+								"admin",
+								"1"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Verified Reviews & Ratings",
+			"item": [
+				{
+					"name": "Rate Delivered Product (Customer)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"rating\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/1/ratings",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"1",
+								"ratings"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Product Rating Summary",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/products/1/ratings/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"products",
+								"1",
+								"ratings",
+								"summary"
 							]
 						}
 					}

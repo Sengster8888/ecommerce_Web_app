@@ -37,6 +37,7 @@ export class TelegramService {
           user: true,
           address: true,
           items: true,
+          discount: true,
         },
       });
 
@@ -70,6 +71,12 @@ export class TelegramService {
       });
 
       message += `--------------------------------------\n`;
+      message += `<b>Subtotal:</b> $${Number(order.subtotal).toFixed(2)}\n`;
+      if (Number(order.discountAmount) > 0) {
+        const promoCodeText = order.discount?.code ? ` (${order.discount.code})` : '';
+        message += `<b>Discount${promoCodeText}:</b> -$${Number(order.discountAmount).toFixed(2)}\n`;
+      }
+      message += `<b>Shipping Fee:</b> $${Number(order.shippingFee).toFixed(2)}\n`;
       message += `<b>Total Amount:</b> <code>$${Number(order.totalAmount).toFixed(2)}</code>\n\n`;
 
       if (isConfirmed) {

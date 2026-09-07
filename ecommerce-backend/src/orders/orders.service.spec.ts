@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { OrdersService } from './orders.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { TelegramService } from '../telegram/telegram.service.js';
+import { DiscountsService } from '../discounts/discounts.service.js';
 import { vi } from 'vitest';
 
 describe('Order Creation Concurrency (Race Condition Test)', () => {
@@ -17,6 +18,16 @@ describe('Order Creation Concurrency (Race Condition Test)', () => {
           provide: TelegramService,
           useValue: {
             sendOrderNotification: vi.fn().mockResolvedValue(true),
+          },
+        },
+        {
+          provide: DiscountsService,
+          useValue: {
+            validateDiscount: vi.fn().mockResolvedValue({
+              discountId: null,
+              discountAmount: 0,
+              newSubtotal: 0,
+            }),
           },
         },
       ],

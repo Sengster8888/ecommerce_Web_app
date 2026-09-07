@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export enum PaymentMethod {
   KHQR = 'khqr',
@@ -15,4 +15,8 @@ export class CheckoutDto {
   })
   @IsNotEmpty()
   paymentMethod: PaymentMethod;
+
+  @IsOptional()
+  @IsString()
+  promoCode?: string;
 }

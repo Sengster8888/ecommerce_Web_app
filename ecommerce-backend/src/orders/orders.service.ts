@@ -2,6 +2,8 @@ import { Injectable, BadRequestException, ConflictException, NotFoundException, 
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CheckoutDto, PaymentMethod } from './dto/checkout.dto.js';
 import { TelegramService } from '../telegram/telegram.service.js';
+import { DiscountsService } from '../discounts/discounts.service.js';
+import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class OrdersService {
@@ -10,6 +12,7 @@ export class OrdersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly telegramService: TelegramService,
+    private readonly discountsService: DiscountsService,
   ) {}
 
   async checkout(userId: string, dto: CheckoutDto) {
@@ -92,9 +95,41 @@ export class OrdersService {
         });
       }
 
+      // Process optional promo code or automatic discounts
+      const cartItemContexts = cart.items.map((item) => ({
+        productId: item.productId,
+        categoryId: item.product.categoryId,
+        unitPrice: Number(item.product.price),
+        quantity: item.quantity,
+      }));
+
+      const discountResult = await this.discountsService.validateDiscount(
+        dto.promoCode,
+        subtotal,
+        cartItemContexts,
+        userId,
+      );
+
+      let calculatedDiscount = new Decimal(0);
+      let discountId: bigint | null = null;
+
+      if (discountResult.discountId) {
+        discountId = BigInt(discountResult.discountId);
+        calculatedDiscount = new Decimal(discountResult.discountAmount);
+
+        // Increment the discount utilization count atomically inside active transaction
+        await tx.discount.update({
+          where: { id: discountId },
+          data: {
+            usageCount: { increment: 1 },
+          },
+        });
+      }
+
       // Calculate flat rates/fees (Free Shipping: $0.00)
       const shippingFee = 0.00; 
-      const totalAmount = subtotal + shippingFee;
+      const discountNum = Number(calculatedDiscount);
+      const totalAmount = Math.max(0, subtotal - discountNum + shippingFee);
 
       // Generate a human-readable order number (ORD-YYYYMMDD-XXXX)
       const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -112,9 +147,11 @@ export class OrdersService {
           addressId,
           status: initialStatus,
           subtotal: subtotal,
+          discountAmount: calculatedDiscount,
           shippingFee: shippingFee,
           totalAmount: totalAmount,
           paymentMethod: dto.paymentMethod,
+          discountId: discountId,
           items: {
             createMany: {
               data: orderItemsData,

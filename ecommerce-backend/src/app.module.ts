@@ -14,6 +14,8 @@ import { AdminOrdersModule } from './admin-orders/admin-orders.module.js';
 import { TelegramModule } from './telegram/telegram.module.js';
 import { PaymentsModule } from './payments/payments.module.js';
 import { OrderTrackingModule } from './order-tracking/order-tracking.module.js';
+import { DiscountsModule } from './discounts/discounts.module.js';
+import { ReviewsModule } from './reviews/reviews.module.js';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { OrderTrackingModule } from './order-tracking/order-tracking.module.js';
     TelegramModule,
     PaymentsModule,
     OrderTrackingModule,
+    DiscountsModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

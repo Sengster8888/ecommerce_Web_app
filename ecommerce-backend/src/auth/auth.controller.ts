@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Req, UseGuards, UnauthorizedException, Get, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Post, Body, Res, Req, UseGuards, UnauthorizedException, Get, Patch, InternalServerErrorException } from '@nestjs/common';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { AuthGuard } from '@nestjs/passport';
 import type { Response, Request } from 'express';
@@ -9,8 +9,10 @@ import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -92,12 +94,31 @@ export class AuthController {
     return { message: 'Logged out successfully, session invalidated.' };
   }
 
+  @ApiOperation({ summary: 'Get current logged-in user profile' })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@Req() request: Request) {
-    // request.user is set by the Passport JwtStrategy validate() function
     const user = request.user as any;
     return this.authService.getProfile(user?.id);
+  }
+
+  @ApiOperation({ summary: 'Update profile details (name, phone, avatarUrl)' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  async updateProfile(@Req() request: Request, @Body() dto: UpdateProfileDto) {
+    const user = request.user as any;
+    return this.authService.updateProfile(user?.id, dto);
+  }
+
+  @ApiOperation({ summary: 'Change password for authenticated user' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('password/change')
+  async changePassword(@Req() request: Request, @Body() dto: ChangePasswordDto) {
+    const user = request.user as any;
+    return this.authService.changePassword(user?.id, dto);
   }
 
   @UseGuards(ThrottlerGuard)

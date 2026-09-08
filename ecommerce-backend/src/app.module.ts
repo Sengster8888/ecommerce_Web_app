@@ -16,6 +16,7 @@ import { PaymentsModule } from './payments/payments.module.js';
 import { OrderTrackingModule } from './order-tracking/order-tracking.module.js';
 import { DiscountsModule } from './discounts/discounts.module.js';
 import { ReviewsModule } from './reviews/reviews.module.js';
+import { AddressesModule } from './addresses/addresses.module.js';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ReviewsModule } from './reviews/reviews.module.js';
     OrderTrackingModule,
     DiscountsModule,
     ReviewsModule,
+    AddressesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

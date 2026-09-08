@@ -5,6 +5,8 @@ import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto.js';
 import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { MailService } from '../mail/mail.service.js';
 
 @Injectable()
@@ -30,6 +32,63 @@ export class AuthService {
     // Strip sensitive hashes before sending back to client
     const { passwordHash: _, refreshTokenHash: __, ...result } = user;
     return result;
+  }
+
+  // Update customer profile (name, phone, avatarUrl)
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      throw new NotFoundException('User profile does not exist.');
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(dto.name && { name: dto.name }),
+        ...(dto.phone !== undefined && { phone: dto.phone }),
+        ...(dto.avatarUrl !== undefined && { avatarUrl: dto.avatarUrl }),
+      },
+    });
+
+    const { passwordHash: _, refreshTokenHash: __, ...result } = updatedUser;
+    return result;
+  }
+
+  // Change password for logged-in user
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User profile does not exist.');
+    }
+
+    if (!user.passwordHash) {
+      throw new BadRequestException(
+        'Account does not have a password set (registered via OAuth). Please use password reset or contact support.',
+      );
+    }
+
+    const isMatch = await bcrypt.compare(dto.currentPassword, user.passwordHash);
+    if (!isMatch) {
+      throw new BadRequestException('Current password does not match.');
+    }
+
+    const newPasswordHash = await bcrypt.hash(dto.newPassword, 12);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash: newPasswordHash,
+        refreshTokenHash: null, // Invalidate existing sessions on other devices
+      },
+    });
+
+    return { message: 'Password changed successfully. Please log in again if needed.' };
   }
 
   // Generate and send a 6-digit OTP code

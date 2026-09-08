@@ -16,6 +16,7 @@ describe('AuthService (2-Step OTP Registration)', () => {
       user: {
         findUnique: vi.fn(),
         create: vi.fn(),
+        update: vi.fn(),
       },
       otpVerification: {
         deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
@@ -138,6 +139,88 @@ describe('AuthService (2-Step OTP Registration)', () => {
 
       await expect(service.verifyRegistrationOtp(dto)).rejects.toThrow(BadRequestException);
       expect(prisma.user.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateProfile', () => {
+    it('should update user name, phone, and avatarUrl successfully', async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        name: 'Old Name',
+        email: 'john@example.com',
+        phone: '00000000',
+        avatarUrl: null,
+      });
+
+      prisma.user.update.mockResolvedValue({
+        id: 'user-1',
+        name: 'New Name',
+        email: 'john@example.com',
+        phone: '012345678',
+        avatarUrl: 'https://cloudinary.com/avatar.jpg',
+        passwordHash: 'secret',
+        refreshTokenHash: 'token',
+      });
+
+      const result = await service.updateProfile('user-1', {
+        name: 'New Name',
+        phone: '012345678',
+        avatarUrl: 'https://cloudinary.com/avatar.jpg',
+      });
+
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: {
+          name: 'New Name',
+          phone: '012345678',
+          avatarUrl: 'https://cloudinary.com/avatar.jpg',
+        },
+      });
+
+      expect(result.name).toBe('New Name');
+      expect(result.avatarUrl).toBe('https://cloudinary.com/avatar.jpg');
+      expect((result as any).passwordHash).toBeUndefined();
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should change password successfully when current password matches', async () => {
+      const bcrypt = await import('bcrypt');
+      const hashedOldPassword = await bcrypt.hash('OldPassword123!', 10);
+
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        email: 'john@example.com',
+        passwordHash: hashedOldPassword,
+      });
+
+      prisma.user.update.mockResolvedValue({ id: 'user-1' });
+
+      const result = await service.changePassword('user-1', {
+        currentPassword: 'OldPassword123!',
+        newPassword: 'NewSuperPassword123!',
+      });
+
+      expect(prisma.user.update).toHaveBeenCalled();
+      expect(result.message).toContain('Password changed successfully');
+    });
+
+    it('should throw BadRequestException if current password does not match', async () => {
+      const bcrypt = await import('bcrypt');
+      const hashedOldPassword = await bcrypt.hash('OldPassword123!', 10);
+
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        email: 'john@example.com',
+        passwordHash: hashedOldPassword,
+      });
+
+      await expect(
+        service.changePassword('user-1', {
+          currentPassword: 'WrongPassword!',
+          newPassword: 'NewSuperPassword123!',
+        }),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { RegisterForm } from '../features/auth/components/RegisterForm';
+import { ForgotPasswordForm } from '../features/auth/components/ForgotPasswordForm';
 
-export const RegisterPage: React.FC = () => {
+export const ForgotPasswordPage: React.FC = () => {
   const [lang, setLang] = useState<'EN' | 'KH'>('EN');
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
-      {/* Background Ambient Glow Orbs */}
+      {/* Ambient Orbs */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] rounded-full bg-primary-container/10 blur-[120px]"></div>
         <div className="absolute top-1/3 -right-32 w-[450px] h-[450px] rounded-full bg-secondary-container/10 blur-[140px]"></div>
@@ -78,120 +78,127 @@ export const RegisterPage: React.FC = () => {
       <main className="w-full pt-20 pb-12 flex-1 relative z-10 bg-transparent flex flex-col justify-center">
         <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 lg:py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start min-h-[calc(100vh-11rem)]">
-            {/* Left Benefit Column (5 Cols Desktop) */}
-            <div className="lg:col-span-5 flex flex-col gap-6">
-              {/* Overhead Label & Subhead */}
+            {/* Left Column (6 Cols) */}
+            <div className="lg:col-span-6 flex flex-col gap-6 lg:pr-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-secondary font-label-sm text-label-sm tracking-wider uppercase shadow-sm border border-white/5 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-ping"></span>
+                  Secure Recovery Protocol
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-low text-tertiary font-label-sm text-label-sm border border-white/5 font-semibold">
+                  <span className="material-symbols-outlined text-[14px]">lock</span>
+                  Bank-Grade 256-bit SSL
+                </span>
+              </div>
+
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                  <span className="font-label-sm text-label-sm text-secondary tracking-widest uppercase font-semibold">
-                    E-Store VIP Privilege
-                  </span>
-                </div>
-                <h2 className="font-headline-lg text-headline-lg text-on-surface">
-                  Unlock Next-Gen Retail in Cambodia
-                </h2>
-                <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                  Connect directly with Phnom Penh &amp; Siem Reap fulfillment hubs. Enjoy guaranteed authenticity, instant automated settlements, and dedicated regional support.
+                <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+                  Account Recovery &amp; Identity Verification
+                </h1>
+                <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl leading-relaxed">
+                  Regain instant access to your verified Cambodian E-Store profile, order history, and Bakong KHQR wallet credentials.
                 </p>
               </div>
 
-              {/* Media Feature Card */}
-              <div className="relative overflow-hidden rounded-2xl bg-surface-container-low border border-white/5 shadow-xl p-5 flex flex-col gap-4">
-                <div className="relative h-44 w-full rounded-xl overflow-hidden bg-surface-container-high flex items-center justify-center">
-                  {/* Decorative High-Tech Storefront SVG Header */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-container/30 via-secondary-container/20 to-surface-container-lowest flex items-center justify-center p-6 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="material-symbols-outlined text-secondary text-[48px]">
-                        workspace_premium
-                      </span>
-                      <span className="font-headline-sm text-headline-sm text-on-surface">
-                        Authorized Cambodian Retail Network
-                      </span>
-                    </div>
+              {/* 3 Security Pillars */}
+              <div className="flex flex-col gap-4 pt-2">
+                <div className="flex items-start gap-4 p-4 rounded-xl bg-surface-container-low/80 backdrop-blur-md border border-white/5 shadow-md hover:bg-surface-container-high transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-primary-container/20 flex items-center justify-center shrink-0 text-primary shadow-[0_0_16px_rgba(192,193,255,0.25)]">
+                    <span className="material-symbols-outlined text-[24px]">mark_email_read</span>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-full bg-surface-container-highest/80 backdrop-blur-md text-tertiary font-label-sm text-label-sm flex items-center gap-1.5 shadow-sm border border-white/5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Verified Merchant Fleet
+                  <div className="flex flex-col gap-1">
+                    <span className="font-headline-sm text-headline-sm text-on-surface">
+                      Email One-Time Security Passcode (OTP)
                     </span>
-                    <span className="font-label-sm text-label-sm text-on-surface-variant font-mono">
-                      KH-855 Gateway
-                    </span>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                      We dispatch a time-sensitive 6-digit cryptographic verification PIN directly to your email inbox.
+                    </p>
                   </div>
                 </div>
 
-                {/* Feature Benefit Stack */}
-                <div className="flex flex-col gap-3">
-                  {/* Benefit 1 */}
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors border border-white/5">
-                    <div className="w-10 h-10 rounded-lg bg-tertiary-container/30 flex items-center justify-center shrink-0 text-tertiary shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">payments</span>
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-headline-sm text-headline-sm text-on-surface">
-                          5% Bakong KHQR Cashback
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-tertiary/20 text-tertiary font-bold uppercase">
-                          Instant
-                        </span>
-                      </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Direct credit to your Bakong wallet upon invoice confirmation.
-                      </p>
-                    </div>
+                <div className="flex items-start gap-4 p-4 rounded-xl bg-surface-container-low/80 backdrop-blur-md border border-white/5 shadow-md hover:bg-surface-container-high transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-tertiary-container/20 flex items-center justify-center shrink-0 text-tertiary shadow-[0_0_16px_rgba(78,222,163,0.25)]">
+                    <span className="material-symbols-outlined text-[24px]">account_balance_wallet</span>
                   </div>
-
-                  {/* Benefit 2 */}
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors border border-white/5">
-                    <div className="w-10 h-10 rounded-lg bg-secondary-container/20 flex items-center justify-center shrink-0 text-secondary shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">local_shipping</span>
-                    </div>
-                    <div className="flex flex-col min-w-0">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
                       <span className="font-headline-sm text-headline-sm text-on-surface">
-                        Free Delivery: First 3 Orders
+                        Protected Bakong KHQR Wallet
                       </span>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Valid across all 25 provinces via express local courier networks.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Benefit 3 */}
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors border border-white/5">
-                    <div className="w-10 h-10 rounded-lg bg-primary-container/20 flex items-center justify-center shrink-0 text-primary shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">support_agent</span>
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-headline-sm text-headline-sm text-on-surface">
-                        Priority 24/7 Telegram Support
+                      <span className="px-2 py-0.5 rounded text-[10px] font-label-sm font-semibold bg-tertiary/10 text-tertiary">
+                        Safe Mode
                       </span>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Live bilingual agents (Khmer &amp; English) for order tracking &amp; help.
-                      </p>
                     </div>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                      Your payment tokens and linked NBC Bakong merchant authorizations remain frozen until full verification.
+                    </p>
                   </div>
                 </div>
 
-                {/* NBC Compliance Badge */}
-                <div className="pt-2 flex items-center justify-between bg-surface-container-lowest/60 rounded-xl p-3 border border-white/5">
-                  <div className="flex items-center gap-2 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px] text-tertiary">
-                      health_and_safety
-                    </span>
-                    <span className="font-label-sm text-label-sm">NBC Compliance Node #4108</span>
+                <div className="flex items-start gap-4 p-4 rounded-xl bg-surface-container-low/80 backdrop-blur-md border border-white/5 shadow-md hover:bg-surface-container-high transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-secondary-container/20 flex items-center justify-center shrink-0 text-secondary shadow-[0_0_16px_rgba(76,215,246,0.25)]">
+                    <span className="material-symbols-outlined text-[24px]">headset_mic</span>
                   </div>
-                  <span className="font-label-sm text-label-sm text-secondary font-semibold">
-                    99.98% Gateway Uptime
-                  </span>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-headline-sm text-headline-sm text-on-surface">
+                      24/7 Security Assistance
+                    </span>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                      Immediate bilingual live concierge support in Phnom Penh available for account recovery escalations.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Registration Form Card (7 Cols Desktop) */}
-            <div className="lg:col-span-7">
-              <RegisterForm />
+            {/* Right Form Card (6 Cols) */}
+            <div className="lg:col-span-6">
+              <ForgotPasswordForm />
+            </div>
+          </div>
+
+          {/* Bottom 3 Trust Cards */}
+          <div className="mt-12 pt-8 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/5">
+            <div className="p-4 rounded-xl bg-surface-container-low flex items-center gap-4 border border-white/5">
+              <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 text-primary">
+                <span className="material-symbols-outlined text-[20px]">phonelink_lock</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-label-lg text-label-lg text-on-surface font-semibold">
+                  Bakong Token Shield
+                </span>
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  Wallet keys remain encrypted at device rest
+                </span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-surface-container-low flex items-center gap-4 border border-white/5">
+              <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 text-secondary">
+                <span className="material-symbols-outlined text-[20px]">hourglass_top</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-label-lg text-label-lg text-on-surface font-semibold">
+                  5-Minute Expiration
+                </span>
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  Strict PIN validity windows prevent replay attacks
+                </span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-surface-container-low flex items-center gap-4 border border-white/5">
+              <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 text-tertiary">
+                <span className="material-symbols-outlined text-[20px]">support_agent</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-label-lg text-label-lg text-on-surface font-semibold">
+                  Dedicated Khmer Concierge
+                </span>
+                <span className="font-body-sm text-body-sm text-on-surface-variant">
+                  Mon - Sun: 7:00 AM - 11:00 PM (ICT UTC+7)
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -249,4 +256,4 @@ export const RegisterPage: React.FC = () => {
   );
 };
 
-export default RegisterPage;
+export default ForgotPasswordPage;

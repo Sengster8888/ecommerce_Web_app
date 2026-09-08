@@ -1,2 +1,1 @@
-// Shared types index export
-export {};
+export * from './api.types';

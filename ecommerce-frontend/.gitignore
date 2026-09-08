@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+
 
 # Editor directories and files
 .vscode/*
@@ -25,4 +27,6 @@ dist-ssr
 
 # Exclude generated/imported asset folders
 stitch_cambodian_e_store_web_platform/
+
+DESIGN.md
 

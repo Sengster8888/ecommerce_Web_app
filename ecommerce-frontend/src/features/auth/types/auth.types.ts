@@ -1,0 +1,2 @@
+// Auth TypeScript interfaces
+export {};

@@ -1,0 +1,2 @@
+// ProductsPage placeholder
+export {};

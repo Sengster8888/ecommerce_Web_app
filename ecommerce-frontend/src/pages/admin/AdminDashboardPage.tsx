@@ -1,0 +1,2 @@
+// AdminDashboardPage placeholder
+export {};

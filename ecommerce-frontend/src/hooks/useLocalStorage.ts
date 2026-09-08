@@ -1,0 +1,2 @@
+// useLocalStorage hook placeholder
+export {};

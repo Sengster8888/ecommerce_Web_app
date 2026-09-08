@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Exclude generated/imported asset folders
+stitch_cambodian_e_store_web_platform/
+

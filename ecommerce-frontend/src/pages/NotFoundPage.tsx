@@ -1,0 +1,2 @@
+// NotFoundPage placeholder
+export {};

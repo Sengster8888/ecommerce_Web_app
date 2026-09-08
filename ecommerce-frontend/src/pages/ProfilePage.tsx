@@ -1,0 +1,2 @@
+// ProfilePage placeholder
+export {};

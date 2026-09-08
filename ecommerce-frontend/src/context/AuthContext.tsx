@@ -1,0 +1,2 @@
+// AuthContext placeholder
+export {};

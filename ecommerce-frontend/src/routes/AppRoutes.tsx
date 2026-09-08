@@ -1,0 +1,2 @@
+// AppRoutes placeholder
+export {};

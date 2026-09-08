@@ -1,0 +1,2 @@
+// AdminProductsPage placeholder
+export {};

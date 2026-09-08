@@ -1,0 +1,2 @@
+// Address TypeScript interfaces
+export {};

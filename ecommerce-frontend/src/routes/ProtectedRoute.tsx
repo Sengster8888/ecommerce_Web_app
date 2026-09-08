@@ -1,0 +1,2 @@
+// ProtectedRoute placeholder
+export {};

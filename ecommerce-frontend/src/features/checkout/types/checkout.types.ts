@@ -1,0 +1,2 @@
+// Checkout TypeScript interfaces
+export {};

@@ -1,0 +1,2 @@
+// OrderDetailPage placeholder
+export {};

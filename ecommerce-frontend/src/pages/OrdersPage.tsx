@@ -1,0 +1,2 @@
+// OrdersPage placeholder
+export {};

@@ -1,0 +1,2 @@
+// AdminOrdersPage placeholder
+export {};

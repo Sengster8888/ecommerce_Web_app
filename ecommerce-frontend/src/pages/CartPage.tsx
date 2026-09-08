@@ -1,0 +1,2 @@
+// CartPage placeholder
+export {};

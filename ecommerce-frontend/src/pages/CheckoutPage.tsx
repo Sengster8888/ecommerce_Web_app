@@ -1,0 +1,2 @@
+// CheckoutPage placeholder
+export {};

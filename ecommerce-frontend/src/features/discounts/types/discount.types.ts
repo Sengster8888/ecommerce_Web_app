@@ -1,0 +1,2 @@
+// Discount TypeScript interfaces
+export {};

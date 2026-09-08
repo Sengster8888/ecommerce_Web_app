@@ -1,0 +1,2 @@
+// Product TypeScript interfaces
+export {};

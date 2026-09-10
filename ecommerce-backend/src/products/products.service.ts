@@ -6,6 +6,33 @@ import { CreateProductDto } from './dto/create-product.dto.js';
 export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private formatProduct(product: any) {
+    if (!product) return null;
+    const reviews = product.reviews || [];
+    const reviewCount = reviews.length;
+    const ratingSum = reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0);
+    const rating = reviewCount > 0 ? parseFloat((ratingSum / reviewCount).toFixed(1)) : 0;
+
+    return {
+      ...product,
+      id: product.id?.toString(),
+      categoryId: product.categoryId?.toString(),
+      price: Number(product.price),
+      rating,
+      reviewCount,
+      images: product.images?.map((img: any) => ({
+        ...img,
+        id: img.id?.toString(),
+        productId: img.productId?.toString(),
+      })),
+      category: product.category ? {
+        ...product.category,
+        id: product.category.id?.toString(),
+        parentCategoryId: product.category.parentCategoryId?.toString(),
+      } : undefined,
+    };
+  }
+
   async create(dto: CreateProductDto) {
     const slugExists = await this.prisma.product.findUnique({ where: { slug: dto.slug } });
     if (slugExists) {
@@ -18,7 +45,7 @@ export class ProductsService {
       throw new NotFoundException('Category not found.');
     }
 
-    return this.prisma.product.create({
+    const created = await this.prisma.product.create({
       data: {
         name: dto.name,
         slug: dto.slug,
@@ -37,8 +64,10 @@ export class ProductsService {
           },
         } : undefined,
       },
-      include: { images: true, category: true },
+      include: { images: true, category: true, reviews: { select: { rating: true } } },
     });
+
+    return this.formatProduct(created);
   }
 
   async findAll(filters: { page: number; limit: number; categoryId?: string; search?: string }) {
@@ -56,16 +85,22 @@ export class ProductsService {
       ];
     }
 
-    const [total, data] = await Promise.all([
+    const [total, rawData] = await Promise.all([
       this.prisma.product.count({ where }),
       this.prisma.product.findMany({
         where,
         skip,
         take: limit,
-        include: { images: { orderBy: { sortOrder: 'asc' } }, category: true },
+        include: {
+          images: { orderBy: { sortOrder: 'asc' } },
+          category: true,
+          reviews: { select: { rating: true } },
+        },
         orderBy: { createdAt: 'desc' },
       }),
     ]);
+
+    const data = rawData.map((p) => this.formatProduct(p));
 
     return {
       data,
@@ -76,23 +111,27 @@ export class ProductsService {
   async findOne(id: bigint) {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { images: true, category: true },
+      include: { images: true, category: true, reviews: { select: { rating: true } } },
     });
     if (!product) {
       throw new NotFoundException('Product not found.');
     }
-    return product;
+    return this.formatProduct(product);
   }
 
   async findBySlug(slug: string) {
     const product = await this.prisma.product.findUnique({
       where: { slug },
-      include: { images: { orderBy: { sortOrder: 'asc' } }, category: true },
+      include: {
+        images: { orderBy: { sortOrder: 'asc' } },
+        category: true,
+        reviews: { select: { rating: true } },
+      },
     });
     if (!product) {
       throw new NotFoundException('Product not found.');
     }
-    return product;
+    return this.formatProduct(product);
   }
 
   async update(id: bigint, dto: Partial<CreateProductDto>) {
@@ -110,7 +149,7 @@ export class ProductsService {
       }
     }
 
-    return this.prisma.product.update({
+    const updated = await this.prisma.product.update({
       where: { id },
       data: {
         name: dto.name,
@@ -121,8 +160,10 @@ export class ProductsService {
         status: dto.status,
         categoryId: catId,
       },
-      include: { images: true },
+      include: { images: true, category: true, reviews: { select: { rating: true } } },
     });
+
+    return this.formatProduct(updated);
   }
 
   async delete(id: bigint) {
@@ -131,10 +172,8 @@ export class ProductsService {
       throw new NotFoundException('Product to delete not found.');
     }
 
-    // Historical Orders Referential Integrity Guard:
     const ordersCount = await this.prisma.orderItem.count({ where: { productId: id } });
     if (ordersCount > 0) {
-      // If product has historic sales, archive instead of deleting to prevent relational failure
       await this.prisma.product.update({
         where: { id },
         data: { status: 'inactive' },

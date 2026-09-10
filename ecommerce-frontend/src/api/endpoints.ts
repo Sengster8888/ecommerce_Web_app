@@ -22,20 +22,37 @@ export const ENDPOINTS = {
     CATEGORIES: '/categories',
   },
   CART: {
-    GET: '/carts',
-    ADD: '/carts/items',
-    UPDATE: (itemId: string) => `/carts/items/${itemId}`,
-    REMOVE: (itemId: string) => `/carts/items/${itemId}`,
-    CLEAR: '/carts/clear',
+    GET: '/cart',
+    ADD: '/cart/items',
+    UPDATE: (itemId: string) => `/cart/items/${itemId}`,
+    REMOVE: (itemId: string) => `/cart/items/${itemId}`,
+    CLEAR: '/cart',
   },
   ORDERS: {
     LIST: '/orders',
+    CHECKOUT: '/orders/checkout',
     CREATE: '/orders',
     DETAIL: (id: string) => `/orders/${id}`,
-    TRACKING: (trackingNumber: string) => `/order-tracking/${trackingNumber}`,
+    TRACKING: (id: string) => `/orders/${id}/tracking`,
+  },
+  ADDRESSES: {
+    LIST: '/addresses',
+    CREATE: '/addresses',
+    DETAIL: (id: string) => `/addresses/${id}`,
+    SET_DEFAULT: (id: string) => `/addresses/${id}/default`,
+    DELETE: (id: string) => `/addresses/${id}`,
+  },
+  DISCOUNTS: {
+    VALIDATE: '/discounts/validate',
   },
   ADMIN: {
     ORDERS: '/admin/orders',
     UPDATE_ORDER_STATUS: (id: string) => `/admin/orders/${id}/status`,
   },
+  PAYMENTS: {
+    INITIATE: '/payments',
+    GET_STATUS: (id: string) => `/payments/${id}`,
+    SIMULATE_WEBHOOK: (id: string) => `/payments/${id}/simulate-webhook`,
+  },
 };
+

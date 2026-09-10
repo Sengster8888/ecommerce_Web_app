@@ -41,7 +41,7 @@ export class KhqrService implements PaymentGateway {
 
       let response: any;
 
-      if (merchantId) {
+      if (merchantId && merchantId.trim().length > 0) {
         // Generate Dynamic Merchant KHQR Payload
         const merchantInfo = new MerchantInfo(
           bakongAccountId,

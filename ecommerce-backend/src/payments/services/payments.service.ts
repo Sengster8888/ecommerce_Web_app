@@ -31,7 +31,7 @@ export class PaymentsService {
       throw new NotFoundException('Order not found.');
     }
 
-    if (order.paymentMethod !== 'khqr') {
+    if (order.paymentMethod !== 'khqr' && order.paymentMethod !== 'bakong') {
       throw new BadRequestException('This order is not configured for KHQR payments.');
     }
 
@@ -106,7 +106,9 @@ export class PaymentsService {
     };
   }
 
-  // 2. Query Payment Status
+  private lastBakongCheckMap = new Map<string, number>();
+
+  // 2. Query Payment Status & Auto-verify with Bakong API MD5 (Throttled every 20s to preserve quota)
   async getPaymentStatus(paymentId: bigint) {
     const payment = await this.prisma.payment.findUnique({
       where: { id: paymentId },
@@ -114,6 +116,28 @@ export class PaymentsService {
     if (!payment) {
       throw new NotFoundException('Payment record not found.');
     }
+
+    if (payment.status === 'PENDING' && payment.md5) {
+      const key = paymentId.toString();
+      const now = Date.now();
+      const lastCheck = this.lastBakongCheckMap.get(key) || 0;
+
+      // Throttle NBC Bakong external API calls to once every 20 seconds (20,000ms) per payment
+      if (now - lastCheck >= 20000) {
+        this.lastBakongCheckMap.set(key, now);
+        console.log(`[BAKONG QUOTA SAFEGUARD] Polling Bakong API for payment #${paymentId}`);
+        const verifyRes = await this.khqrService.verifyTransaction(payment.md5);
+        if (verifyRes.success) {
+          await this.processPaymentCallback(paymentId, {
+            status: 'PAID',
+            providerReference: `TXN-BAKONG-${payment.md5.substring(0, 8)}`,
+          });
+          this.lastBakongCheckMap.delete(key);
+          return this.prisma.payment.findUnique({ where: { id: paymentId } });
+        }
+      }
+    }
+
     return payment;
   }
 

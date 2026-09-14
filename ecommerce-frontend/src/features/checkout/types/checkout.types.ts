@@ -31,8 +31,13 @@ export interface CheckoutPayload {
 
 export interface DiscountValidationResult {
   discountId?: string;
+  name?: string;
+  code?: string;
+  type?: string;
+  scope?: string;
+  value?: number;
   discountAmount: number;
-  isValid: boolean;
+  isValid?: boolean;
   message?: string;
 }
 

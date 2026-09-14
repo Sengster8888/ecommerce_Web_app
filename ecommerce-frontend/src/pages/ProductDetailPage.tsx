@@ -10,9 +10,17 @@ import { ProductQuickViewModal } from '../components/storefront/ProductQuickView
 import { StorefrontFooter } from '../components/storefront/StorefrontFooter';
 import { ToastNotification } from '../components/storefront/ToastNotification';
 
+import { useAuth } from '../features/auth/hooks/useAuth';
+import {
+  submitProductRatingApi,
+  getProductRatingSummaryApi,
+  type RatingSummary,
+} from '../features/reviews/api/reviews.api';
+
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { product, loading, error } = useProductDetail(id || null);
   const { products: relatedProducts } = useProducts({ limit: 4 });
 
@@ -27,6 +35,61 @@ export const ProductDetailPage: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isToastVisible, setIsToastVisible] = useState<boolean>(false);
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
+
+  // Reviews & Ratings state
+  const [ratingSummary, setRatingSummary] = useState<RatingSummary>({ averageRating: 4.8, totalRatingsCount: 12 });
+  const [selectedRating, setSelectedRating] = useState<number>(5);
+  const [submittingRating, setSubmittingRating] = useState<boolean>(false);
+
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg);
+    setIsToastVisible(true);
+    setTimeout(() => {
+      setIsToastVisible(false);
+    }, 2800);
+  }, []);
+
+  const loadRatingSummary = useCallback(async (productId: string | number) => {
+    try {
+      const summary = await getProductRatingSummaryApi(productId);
+      if (summary && summary.totalRatingsCount > 0) {
+        setRatingSummary(summary);
+      }
+    } catch (err) {
+      console.warn('Failed to load rating summary:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (product?.id) {
+      loadRatingSummary(product.id);
+    }
+  }, [product, loadRatingSummary]);
+
+  const handleRatingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product?.id) return;
+    if (!isAuthenticated) {
+      showToast('Please sign in to rate products.');
+      navigate('/login');
+      return;
+    }
+    setSubmittingRating(true);
+    try {
+      await submitProductRatingApi(product.id, selectedRating);
+      showToast('Thank you! Your verified rating has been submitted.');
+      await loadRatingSummary(product.id);
+    } catch (err: any) {
+      const errorMsg =
+        err.response?.data?.message ||
+        (Array.isArray(err.response?.data?.message)
+          ? err.response?.data?.message.join(', ')
+          : 'You can only rate products that you have purchased and have been successfully delivered.');
+      showToast(errorMsg);
+    } finally {
+      setSubmittingRating(false);
+    }
+  };
 
   // Load existing cart on mount
   const loadCart = useCallback(async () => {
@@ -55,8 +118,7 @@ export const ProductDetailPage: React.FC = () => {
     if (product) {
       const primary =
         product.images?.find((img) => img.isPrimary)?.imageUrl ||
-        product.images?.[0]?.imageUrl ||
-        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1000&auto=format&fit=crop&q=80';
+        product.images?.[0]?.imageUrl;
       setSelectedImage(primary);
       setQuantity(1);
     }
@@ -114,14 +176,6 @@ export const ProductDetailPage: React.FC = () => {
     product.images && product.images.length > 0
       ? product.images.map((i) => i.imageUrl)
       : [selectedImage];
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setIsToastVisible(true);
-    setTimeout(() => {
-      setIsToastVisible(false);
-    }, 2800);
-  };
 
   const handleAddToCart = async () => {
     setCartItemsCount((prev) => prev + quantity);
@@ -403,24 +457,53 @@ export const ProductDetailPage: React.FC = () => {
                 <div className="flex flex-col gap-8">
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-6 rounded-xl bg-[#0a0e18]/60 border border-[#2a3246]">
                     <div className="md:col-span-4 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-[#2a3246] pb-4 md:pb-0 md:pr-6">
-                      <span className="font-outfit text-5xl font-extrabold text-white">{rating}</span>
+                      <span className="font-outfit text-5xl font-extrabold text-white">{ratingSummary.averageRating}</span>
                       <div className="flex text-amber-400 my-1.5">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className="material-symbols-outlined text-lg" style={{ fontVariationSettings: '"FILL" 1' }}>
+                          <span
+                            key={i}
+                            className="material-symbols-outlined text-lg"
+                            style={{
+                              fontVariationSettings: i < Math.round(ratingSummary.averageRating) ? '"FILL" 1' : '"FILL" 0',
+                            }}
+                          >
                             star
                           </span>
                         ))}
                       </div>
-                      <p className="text-xs text-slate-400">Based on {reviewCount} customer reviews</p>
+                      <p className="text-xs text-slate-400">Based on {ratingSummary.totalRatingsCount} verified customer reviews</p>
                     </div>
-                    <div className="md:col-span-8 flex flex-col gap-2">
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className="w-10 text-slate-300 font-medium">5 star</span>
-                        <div className="flex-1 h-2.5 rounded-full bg-slate-800 overflow-hidden">
-                          <div className="h-full bg-cyan-400 rounded-full" style={{ width: reviewCount > 0 ? '82%' : '0%' }}></div>
+
+                    {/* Rating Submission Form */}
+                    <div className="md:col-span-8 flex flex-col gap-3">
+                      <h4 className="text-sm font-semibold text-white">Rate this product (Verified Purchase)</h4>
+                      <form onSubmit={handleRatingSubmit} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-[#171b26] p-4 rounded-xl border border-[#2a3246]">
+                        <div className="flex items-center gap-1 text-amber-400">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span
+                              key={star}
+                              onClick={() => setSelectedRating(star)}
+                              className={`material-symbols-outlined text-2xl cursor-pointer hover:scale-110 transition-transform ${
+                                star <= selectedRating ? 'text-amber-400' : 'text-slate-600'
+                              }`}
+                              style={{ fontVariationSettings: star <= selectedRating ? '"FILL" 1' : '"FILL" 0' }}
+                            >
+                              star
+                            </span>
+                          ))}
+                          <span className="text-xs font-bold text-white ml-2">{selectedRating}.0 Stars</span>
                         </div>
-                        <span className="w-10 text-right text-slate-400 font-medium">{reviewCount > 0 ? '82%' : '0%'}</span>
-                      </div>
+                        <button
+                          type="submit"
+                          disabled={submittingRating}
+                          className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition-all disabled:opacity-50"
+                        >
+                          {submittingRating ? 'Submitting...' : 'Submit Rating'}
+                        </button>
+                      </form>
+                      <p className="text-[11px] text-slate-400">
+                        * Only customers with delivered orders for this item can submit a verified rating.
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -34,7 +34,24 @@ export const getMeApi = async (): Promise<User> => {
   return response.data;
 };
 
+export const updateProfileApi = async (data: { fullName?: string; phone?: string; avatarUrl?: string }): Promise<User> => {
+  const payload = {
+    name: data.fullName,
+    fullName: data.fullName,
+    phone: data.phone,
+    avatarUrl: data.avatarUrl,
+  };
+  const response = await apiClient.patch<User>(ENDPOINTS.AUTH.UPDATE_PROFILE, payload);
+  return response.data;
+};
+
+export const changePasswordApi = async (data: { currentPassword: string; newPassword: string }): Promise<{ message: string }> => {
+  const response = await apiClient.post<{ message: string }>(ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
+  return response.data;
+};
+
 export const logoutApi = async (): Promise<{ message: string }> => {
   const response = await apiClient.post<{ message: string }>(ENDPOINTS.AUTH.LOGOUT);
   return response.data;
 };
+

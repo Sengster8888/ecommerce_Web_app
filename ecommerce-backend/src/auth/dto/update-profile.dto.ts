@@ -17,6 +17,6 @@ export class UpdateProfileDto {
   @ApiPropertyOptional({ example: 'https://res.cloudinary.com/demo/image/upload/sample.jpg', description: 'Profile avatar image URL' })
   @IsOptional()
   @IsString()
-  @Length(1, 500)
+  @Length(1, 2000000)
   avatarUrl?: string;
 }

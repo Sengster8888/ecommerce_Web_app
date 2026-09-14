@@ -171,6 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resetPassword,
         logout,
         clearError,
+        refreshProfile: loadCurrentUser,
       }}
 
 

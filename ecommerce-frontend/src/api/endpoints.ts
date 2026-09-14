@@ -54,5 +54,9 @@ export const ENDPOINTS = {
     GET_STATUS: (id: string) => `/payments/${id}`,
     SIMULATE_WEBHOOK: (id: string) => `/payments/${id}/simulate-webhook`,
   },
+  REVIEWS: {
+    SUBMIT_RATING: (productId: string | number) => `/products/${productId}/ratings`,
+    GET_SUMMARY: (productId: string | number) => `/products/${productId}/ratings/summary`,
+  },
 };
 

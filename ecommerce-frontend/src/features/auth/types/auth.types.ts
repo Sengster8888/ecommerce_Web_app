@@ -3,6 +3,7 @@ export type UserRole = 'USER' | 'ADMIN';
 export interface User {
   id: string;
   email: string;
+  name?: string;
   fullName?: string;
   phone?: string;
   avatarUrl?: string;
@@ -59,6 +60,7 @@ export interface AuthContextType {
   resetPassword: (data: ResetPasswordData) => Promise<{ message: string }>;
   logout: () => Promise<void>;
   clearError: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 

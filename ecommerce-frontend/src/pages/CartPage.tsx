@@ -322,6 +322,7 @@ export const CartPage: React.FC = () => {
                   {cartItems.length > 0 ? (
                     <Link
                       to="/checkout"
+                      state={{ promoCode: appliedPromo || promoCode, appliedPromo, discountAmount }}
                       className="w-full h-12 rounded-xl bg-primary-container text-on-primary-container font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-xs hover:opacity-95 shadow-[0_0_24px_rgba(99,102,241,0.35)] transition-all"
                     >
                       <span className="material-symbols-outlined text-lg">lock</span>

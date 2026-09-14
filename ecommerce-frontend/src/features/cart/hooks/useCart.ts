@@ -115,8 +115,10 @@ export const useCart = () => {
 
     const result = await validateDiscountApi(promoCode.trim(), subtotal, itemsContext);
     if (result.isValid || result.discountAmount > 0) {
-      setAppliedPromo(promoCode.trim().toUpperCase());
+      const code = promoCode.trim().toUpperCase();
+      setAppliedPromo(code);
       setDiscountAmount(result.discountAmount);
+      sessionStorage.setItem('applied_promo_code', code);
       setPromoError(null);
     } else {
       setPromoError(result.message || 'Invalid or expired promo code.');
@@ -127,6 +129,7 @@ export const useCart = () => {
     setAppliedPromo(null);
     setDiscountAmount(0);
     setPromoCode('');
+    sessionStorage.removeItem('applied_promo_code');
     setPromoError(null);
   };
 

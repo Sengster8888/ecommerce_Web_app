@@ -125,8 +125,12 @@ export const StorefrontHeader: React.FC<StorefrontHeaderProps> = ({
           <div className="flex items-center gap-2 pl-1">
             {isAuthenticated ? (
               <Link to="/profile" className="block relative rounded-full ring-2 ring-[#2a3246] hover:ring-indigo-500 transition-all">
-                <div className="w-8 h-8 rounded-full bg-[#262a35] border border-indigo-500/40 flex items-center justify-center font-bold text-indigo-400 text-xs">
-                  {user?.fullName?.[0] || user?.email?.[0] || 'U'}
+                <div className="w-8 h-8 rounded-full bg-[#262a35] border border-indigo-500/40 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={user?.avatarUrl || `https://api.dicebear.com/10.x/lorelei/svg?seed=${encodeURIComponent(user?.fullName || user?.email || 'User')}&size=64`}
+                    alt="User Profile"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0f131d] shadow-[0_0_8px_rgba(78,222,163,0.8)]"></span>
               </Link>

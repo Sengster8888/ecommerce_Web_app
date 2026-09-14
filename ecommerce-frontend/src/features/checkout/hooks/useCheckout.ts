@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { fetchCart } from '../../cart/api/cart.api';
 import {
   fetchUserAddresses,
@@ -14,6 +14,7 @@ export const exchangeRate = 4100; // 1 USD = 4,100 KHR
 
 export const useCheckout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [cartLoading, setCartLoading] = useState(true);
@@ -51,8 +52,10 @@ export const useCheckout = () => {
         fetchUserAddresses(),
       ]);
 
+      let items: any[] = [];
       if (cartData && cartData.items) {
-        setCartItems(cartData.items);
+        items = cartData.items;
+        setCartItems(items);
       } else {
         setCartItems([]);
       }
@@ -64,12 +67,53 @@ export const useCheckout = () => {
       } else {
         setAddresses([]);
       }
+
+      // Automatically evaluate discounts with backend API
+      if (items.length > 0) {
+        const cartSubtotal = items.reduce((acc, item) => {
+          const price = parsePrice(item.product?.price || 0);
+          return acc + price * item.quantity;
+        }, 0);
+
+        const itemsContext = items.map((item) => ({
+          productId: item.productId,
+          categoryId: item.product?.categoryId,
+          unitPrice: parsePrice(item.product?.price || 0),
+          quantity: item.quantity,
+        }));
+
+        const passedPromo =
+          (location.state as any)?.promoCode ||
+          sessionStorage.getItem('applied_promo_code');
+
+        if (passedPromo && String(passedPromo).trim()) {
+          const code = String(passedPromo).trim();
+          setPromoCode(code);
+          const result = await validateDiscountApi(code, cartSubtotal, itemsContext);
+          if (result && (result.isValid || result.discountAmount > 0)) {
+            setAppliedPromo(code.toUpperCase());
+            setDiscountAmount(result.discountAmount);
+          } else {
+            const autoRes = await validateDiscountApi('', cartSubtotal, itemsContext);
+            if (autoRes && autoRes.discountAmount > 0) {
+              setAppliedPromo(autoRes.code || autoRes.name || 'STORE_VOUCHER');
+              setDiscountAmount(autoRes.discountAmount);
+            }
+          }
+        } else {
+          const autoRes = await validateDiscountApi('', cartSubtotal, itemsContext);
+          if (autoRes && autoRes.discountAmount > 0) {
+            setAppliedPromo(autoRes.code || autoRes.name || 'STORE_VOUCHER');
+            setDiscountAmount(autoRes.discountAmount);
+          }
+        }
+      }
     } catch (err) {
       console.error('Error loading checkout data:', err);
     } finally {
       setCartLoading(false);
     }
-  }, []);
+  }, [location.state]);
 
   useEffect(() => {
     loadCheckoutData();

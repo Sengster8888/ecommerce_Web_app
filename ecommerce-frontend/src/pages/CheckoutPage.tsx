@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { StorefrontHeader } from '../components/storefront/StorefrontHeader';
 import { StorefrontFooter } from '../components/storefront/StorefrontFooter';
-import { useCheckout, exchangeRate } from '../features/checkout/hooks/useCheckout';
+import { useCheckout } from '../features/checkout/hooks/useCheckout';
 import { parsePrice, formatKHR } from '../utils/price.utils';
 
 export const CheckoutPage: React.FC = () => {
@@ -359,38 +359,9 @@ export const CheckoutPage: React.FC = () => {
                         className="mt-1.5 accent-tertiary"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center justify-between gap-space-xs mb-space-2xs">
-                          <div className="flex items-center gap-space-xs">
-                            <span className="font-label-lg text-label-lg text-on-surface font-bold">
-                              Bakong KHQR (NBC Standard)
-                            </span>
-                            <span className="px-space-xs py-0.5 rounded-full bg-tertiary/20 text-tertiary font-label-sm text-label-sm font-semibold">
-                              0% Fee • Instant
-                            </span>
-                          </div>
-                          <span className="font-label-sm text-label-sm text-secondary font-mono tracking-wider font-semibold">
-                            ALL CAMBODIAN BANKS
-                          </span>
-                        </div>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">
-                          Scan with ABA Mobile, Wing, ACLEDA, Canadia, Sathapana, Prince Bank, or any Bakong-enabled app in USD or KHR.
-                        </p>
-                        {/* Supported Bank Badges */}
-                        <div className="flex flex-wrap items-center gap-space-xs">
-                          <span className="px-space-xs py-1 rounded bg-surface-container text-[11px] font-bold text-primary tracking-wide">
-                            ABA PAY
-                          </span>
-                          <span className="px-space-xs py-1 rounded bg-surface-container text-[11px] font-bold text-secondary tracking-wide">
-                            WING BANK
-                          </span>
-                          <span className="px-space-xs py-1 rounded bg-surface-container text-[11px] font-bold text-tertiary tracking-wide">
-                            ACLEDA toanChet
-                          </span>
-                          <span className="px-space-xs py-1 rounded bg-surface-container text-[11px] font-bold text-on-surface tracking-wide">
-                            CANADIA
-                          </span>
-                          <span className="px-space-xs py-1 rounded bg-surface-container text-[11px] font-medium text-outline">
-                            +38 Participating Banks
+                        <div className="flex items-center justify-between gap-space-xs">
+                          <span className="font-label-lg text-label-lg text-on-surface font-bold">
+                            Bakong KHQR (NBC Standard)
                           </span>
                         </div>
                       </div>
@@ -416,17 +387,12 @@ export const CheckoutPage: React.FC = () => {
                         className="mt-1.5 accent-primary"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center justify-between gap-space-xs mb-space-2xs">
+                        <div className="flex flex-wrap items-center justify-between gap-space-xs">
                           <span className="font-label-lg text-label-lg text-on-surface font-semibold">
                             Cash on Delivery (COD)
                           </span>
-                          <span className="px-space-xs py-0.5 rounded bg-surface-container-highest text-secondary font-label-sm text-label-sm">
-                            No Extra Fee
-                          </span>
+                          
                         </div>
-                        <p className="font-body-sm text-body-sm text-on-surface-variant">
-                          Pay driver in physical USD or Khmer Riel cash upon packet arrival. Driver carries verified small denomination change.
-                        </p>
                       </div>
                     </div>
                   </label>
@@ -560,34 +526,42 @@ export const CheckoutPage: React.FC = () => {
 
                 {/* Price Calculation Breakdown */}
                 <div className="space-y-space-xs pt-space-xs mb-space-lg text-on-surface-variant font-body-md text-body-md">
-                  <div className="flex items-center justify-between">
-                    <span>Cart Subtotal ({totalCount} items)</span>
-                    <span className="text-on-surface font-mono font-medium">
-                      ${subtotal.toFixed(2)} <span className="text-outline text-xs">(≈ {formatKHR(subtotal * exchangeRate)} ៛)</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span>Cart Subtotal ({totalCount} {totalCount === 1 ? 'item' : 'items'})</span>
+                    <span className="text-on-surface font-mono font-medium shrink-0">
+                      ${subtotal.toFixed(2)} <span className="text-outline text-xs">(≈ {formatKHR(subtotal)} ៛)</span>
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
+
+                  <div className="flex items-center justify-between gap-2">
                     <span>Delivery Dispatch</span>
-                    <span className="text-tertiary font-mono font-medium">
+                    <span className="text-tertiary font-mono font-medium shrink-0">
                       Free Shipping
                     </span>
                   </div>
+
                   {discountAmount > 0 && (
-                    <div className="flex items-center justify-between text-tertiary">
-                      <span className="flex items-center gap-1">Voucher Discount</span>
-                      <span className="font-mono font-semibold">
-                        -${discountAmount.toFixed(2)} ({-formatKHR(discountAmount * exchangeRate)} ៛)
-                      </span>
+                    <div className="p-2.5 rounded-xl bg-tertiary/10 border border-tertiary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-tertiary shadow-sm">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="material-symbols-outlined text-[18px] shrink-0 text-tertiary">sell</span>
+                        <span className="font-semibold text-xs text-on-surface truncate">
+                          Voucher Discount {appliedPromo ? `(${appliedPromo})` : ''}
+                        </span>
+                      </div>
+                      <div className="font-mono font-bold text-sm text-tertiary shrink-0 text-right">
+                        -${discountAmount.toFixed(2)} <span className="text-xs font-normal opacity-90">(≈ {formatKHR(discountAmount)} ៛)</span>
+                      </div>
                     </div>
                   )}
-                  <div className="flex items-center justify-between">
+
+                  <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-1">
                       <span>Cambodia VAT &amp; Customs (10%)</span>
                       <span className="material-symbols-outlined text-[14px] text-outline" title="Tax inclusive retail value">
                         info
                       </span>
                     </span>
-                    <span className="text-tertiary font-mono text-label-md">Included in retail</span>
+                    <span className="text-tertiary font-mono text-label-md shrink-0">Included in retail</span>
                   </div>
 
                   {/* Total Bar (Large Emphasis) */}
@@ -634,22 +608,6 @@ export const CheckoutPage: React.FC = () => {
                       </>
                     )}
                   </button>
-                  <p className="font-body-sm text-body-sm text-outline text-center px-space-xs leading-relaxed">
-                    By placing this order, you will connect to the official National Bank of Cambodia{' '}
-                    <strong className="text-on-surface">Bakong KHQR</strong> gateway to complete real-time verification.
-                  </p>
-                </div>
-
-                {/* Purchase Protection Features */}
-                <div className="mt-space-lg pt-space-md bg-surface-container-low rounded-xl p-space-sm grid grid-cols-2 gap-space-xs border border-white/5">
-                  <div className="flex items-center gap-space-2xs text-on-surface font-label-sm text-label-sm">
-                    <span className="material-symbols-outlined text-tertiary text-[18px]">verified</span>
-                    <span>100% Genuine Tech</span>
-                  </div>
-                  <div className="flex items-center gap-space-2xs text-on-surface font-label-sm text-label-sm">
-                    <span className="material-symbols-outlined text-secondary text-[18px]">published_with_changes</span>
-                    <span>7-Day Hassle Returns</span>
-                  </div>
                 </div>
               </div>
 

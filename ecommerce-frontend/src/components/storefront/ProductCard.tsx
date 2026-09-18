@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { Product } from '../../features/products/types/product.types';
-import { parsePrice, formatKHR } from '../../utils/price.utils';
+import { parsePrice } from '../../utils/price.utils';
 
 interface ProductCardProps {
   product: Product;
@@ -15,7 +15,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
 }) => {
   const priceNum = parsePrice(product.price);
-  const khrPrice = formatKHR(priceNum);
 
   const primaryImage =
     product.images?.find((img) => img.isPrimary)?.imageUrl ||
@@ -101,7 +100,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <span className="font-price-card text-price-card text-on-surface">
             ${priceNum.toFixed(2)}
           </span>
-          <span className="font-label-sm text-label-sm text-outline">~{khrPrice} KHR</span>
         </Link>
 
         <button

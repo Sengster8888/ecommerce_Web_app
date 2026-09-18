@@ -411,9 +411,9 @@ export const CheckoutPage: React.FC = () => {
 
             {/* Right Column: Sticky Order Summary & Voucher (5 Cols) */}
             <div className="lg:col-span-5 space-y-space-lg lg:sticky lg:top-24">
-              {/* Cart Items Summary Card */}
-              <div className="bg-surface-container rounded-xl p-space-lg shadow-2xl relative border border-white/5">
-                <div className="flex items-center justify-between gap-space-md mb-space-md pb-space-sm border-b border-surface-container-highest/60">
+              {/* Card 1: Order Items */}
+              <div className="p-space-lg rounded-2xl bg-surface-container-low backdrop-blur-xl shadow-xl flex flex-col border border-white/5">
+                <div className="flex items-center justify-between mb-space-sm">
                   <div className="flex items-center gap-space-xs">
                     <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold">Order Items</h2>
                     <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary font-label-sm text-label-sm font-bold">
@@ -422,21 +422,19 @@ export const CheckoutPage: React.FC = () => {
                   </div>
                   <Link to="/cart" className="font-label-sm text-label-sm text-secondary hover:underline flex items-center gap-1">
                     <span>Edit Cart</span>
-                    <span className="material-symbols-outlined text-[14px]">edit</span>
                   </Link>
                 </div>
+                <div className="h-px bg-white/10 w-full mb-space-md"></div>
 
-                {/* Item Rows */}
                 {cartLoading ? (
                   <div className="py-space-md text-center text-on-surface-variant text-body-sm">
                     Loading cart items...
                   </div>
                 ) : cartItems.length > 0 ? (
-                  <div className="space-y-space-md mb-space-lg max-h-80 overflow-y-auto pr-1">
+                  <div className="space-y-space-md max-h-80 overflow-y-auto pr-1">
                     {cartItems.map((item) => {
                       const itemPrice = parsePrice(item.product?.price || 0);
                       const lineTotal = itemPrice * item.quantity;
-                      const lineKhr = formatKHR(lineTotal);
                       const imgUrl =
                         item.product?.images?.find((img: any) => img.isPrimary)?.imageUrl ||
                         item.product?.images?.[0]?.imageUrl ||
@@ -465,9 +463,6 @@ export const CheckoutPage: React.FC = () => {
                             <span className="font-price-card text-price-card text-on-surface font-bold block">
                               ${lineTotal.toFixed(2)}
                             </span>
-                            <span className="font-label-sm text-label-sm text-on-surface-variant font-mono">
-                              {lineKhr} ៛
-                            </span>
                           </div>
                         </div>
                       );
@@ -478,109 +473,73 @@ export const CheckoutPage: React.FC = () => {
                     Your cart is empty. <Link to="/products" className="text-primary hover:underline">Browse Products</Link>
                   </div>
                 )}
+              </div>
 
-                {/* Promo & Voucher Field */}
-                <div className="bg-surface-container-low rounded-xl p-space-sm mb-space-lg border border-white/5">
-                  <div className="flex items-center gap-space-xs mb-space-xs">
-                    <span className="material-symbols-outlined text-secondary text-[18px]">sell</span>
-                    <span className="font-label-md text-label-md text-on-surface font-semibold">
-                      Promotion Code or Store Voucher
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-space-xs">
-                    <input
-                      type="text"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
-                      placeholder="Enter coupon code"
-                      className="flex-1 h-10 px-space-sm rounded-lg bg-surface-container-lowest text-on-surface font-body-md text-body-md uppercase font-mono tracking-wider focus:outline-none border border-white/10"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleApplyPromo}
-                      className="h-10 px-space-md rounded-lg bg-surface-container-highest text-on-surface font-label-md text-label-md font-semibold hover:bg-surface-bright transition-colors cursor-pointer"
-                    >
-                      Apply
-                    </button>
-                  </div>
+              {/* Card 2: Coupon Code */}
+              <div className="p-space-lg rounded-2xl bg-surface-container-low backdrop-blur-xl shadow-xl flex flex-col border border-white/5">
+                <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-sm">Coupon Code</h2>
+                <div className="h-px bg-white/10 w-full mb-space-md"></div>
+                <div className="flex flex-col gap-space-sm">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    placeholder="Enter Your Coupon Code"
+                    className="w-full h-11 px-space-sm rounded-lg bg-surface-container-highest text-on-surface font-body-md text-body-md uppercase font-mono tracking-wider focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/50"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyPromo}
+                    className="w-full h-11 rounded-lg border border-primary text-primary font-label-md text-label-md font-semibold hover:bg-primary/10 transition-colors cursor-pointer"
+                  >
+                    Apply Your Coupon
+                  </button>
                   {promoError && (
-                    <p className="mt-1 text-xs text-error font-body-sm">{promoError}</p>
+                    <p className="text-xs text-error font-body-sm text-center">{promoError}</p>
                   )}
-                  {/* Applied Voucher Tag */}
                   {appliedPromo && (
-                    <div className="mt-space-xs flex items-center justify-between px-space-xs py-1 rounded bg-tertiary/15 text-tertiary font-label-sm text-label-sm">
-                      <div className="flex items-center gap-1 font-mono font-semibold">
-                        <span className="material-symbols-outlined text-[16px]">verified</span>
-                        <span>'{appliedPromo}' APPLIED (-${discountAmount.toFixed(2)})</span>
-                      </div>
+                    <div className="mt-space-2xs flex items-center justify-between px-space-xs py-1 rounded bg-tertiary/15 text-tertiary font-label-sm text-label-sm">
+                      <span className="font-mono font-semibold">'{appliedPromo}' APPLIED (-${discountAmount.toFixed(2)})</span>
                       <button
                         type="button"
                         onClick={handleRemovePromo}
-                        className="text-error hover:underline flex items-center text-[12px] cursor-pointer"
+                        className="text-error hover:underline text-[11px] cursor-pointer"
                       >
                         Remove
                       </button>
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Price Calculation Breakdown */}
-                <div className="space-y-space-xs pt-space-xs mb-space-lg text-on-surface-variant font-body-md text-body-md">
-                  <div className="flex items-center justify-between gap-2">
-                    <span>Cart Subtotal ({totalCount} {totalCount === 1 ? 'item' : 'items'})</span>
-                    <span className="text-on-surface font-mono font-medium shrink-0">
-                      ${subtotal.toFixed(2)} <span className="text-outline text-xs">(≈ {formatKHR(subtotal)} ៛)</span>
-                    </span>
+              {/* Card 3: Order Summary */}
+              <div className="p-space-lg rounded-2xl bg-surface-container-low backdrop-blur-xl shadow-xl flex flex-col border border-white/5">
+                <div className="flex items-center justify-between mb-space-sm">
+                  <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold">Order Summary</h2>
+                </div>
+                <div className="h-px bg-white/10 w-full mb-space-md"></div>
+                
+                <div className="flex flex-col gap-space-sm font-body-md text-body-md text-on-surface-variant mb-space-md">
+                  <div className="flex items-center justify-between">
+                    <span>Discount</span>
+                    <span className="font-semibold text-on-surface">${discountAmount.toFixed(2)}</span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-2">
-                    <span>Delivery Dispatch</span>
-                    <span className="text-tertiary font-mono font-medium shrink-0">
-                      Free Shipping
-                    </span>
+                  <div className="flex items-center justify-between">
+                    <span>Delivery</span>
+                    <span className="font-semibold text-on-surface">$0.00</span>
                   </div>
 
-                  {discountAmount > 0 && (
-                    <div className="p-2.5 rounded-xl bg-tertiary/10 border border-tertiary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-tertiary shadow-sm">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="material-symbols-outlined text-[18px] shrink-0 text-tertiary">sell</span>
-                        <span className="font-semibold text-xs text-on-surface truncate">
-                          Voucher Discount {appliedPromo ? `(${appliedPromo})` : ''}
-                        </span>
-                      </div>
-                      <div className="font-mono font-bold text-sm text-tertiary shrink-0 text-right">
-                        -${discountAmount.toFixed(2)} <span className="text-xs font-normal opacity-90">(≈ {formatKHR(discountAmount)} ៛)</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="flex items-center gap-1">
-                      <span>Cambodia VAT &amp; Customs (10%)</span>
-                      <span className="material-symbols-outlined text-[14px] text-outline" title="Tax inclusive retail value">
-                        info
-                      </span>
-                    </span>
-                    <span className="text-tertiary font-mono text-label-md shrink-0">Included in retail</span>
+                  <div className="flex items-center justify-between">
+                    <span>Tax</span>
+                    <span className="font-semibold text-on-surface">$0.00</span>
                   </div>
+                </div>
 
-                  {/* Total Bar (Large Emphasis) */}
-                  <div className="pt-space-md mt-space-sm bg-surface-container-high rounded-xl p-space-md shadow-inner border border-white/5">
-                    <div className="flex items-baseline justify-between mb-1">
-                      <span className="font-headline-sm text-headline-sm text-on-surface font-bold">Total Amount Due</span>
-                      <div className="text-right">
-                        <span className="font-display-hero-mobile text-display-hero-mobile text-secondary font-bold tracking-tight block">
-                          ${finalTotalUsd.toFixed(2)}
-                        </span>
-                        <span className="font-headline-sm text-headline-sm text-tertiary font-mono block">
-                          ≈ {finalTotalKhr.toLocaleString()} KHR
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between text-[11px] text-outline pt-1">
-                      <span>Exchange peg: 1 USD = 4,100 KHR</span>
-                      <span>Includes all provincial fees</span>
-                    </div>
+                <div className="flex items-center justify-between pt-space-sm border-t border-white/10 mb-space-lg">
+                  <span className="font-body-md text-body-md text-on-surface-variant">Total</span>
+                  <div className="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">
+                    ${finalTotalUsd.toFixed(2)}
                   </div>
                 </div>
 
@@ -592,20 +551,17 @@ export const CheckoutPage: React.FC = () => {
                 )}
 
                 {/* High-Impact Checkout CTA Button */}
-                <div className="space-y-space-sm">
+                <div className="flex flex-col gap-space-xs">
                   <button
                     type="button"
                     onClick={handlePlaceOrder}
                     disabled={isSubmitting || cartItems.length === 0}
-                    className="w-full h-14 rounded-xl bg-primary-container text-on-primary font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-xs shadow-[0_0_24px_rgba(128,131,255,0.45)] hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
+                    className="w-full h-12 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-xs hover:bg-primary-fixed transition-all cursor-pointer disabled:opacity-50"
                   >
                     {isSubmitting ? (
                       <span>Processing Order...</span>
                     ) : (
-                      <>
-                        <span>Place Order &amp; Proceed</span>
-                        <span className="material-symbols-outlined text-[24px]">arrow_forward</span>
-                      </>
+                      <span>Place Order &amp; Proceed</span>
                     )}
                   </button>
                 </div>

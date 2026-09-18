@@ -60,6 +60,16 @@ export const fetchMyOrdersApi = async (): Promise<OrderDetail[]> => {
   }
 };
 
+export const cancelOrderApi = async (orderId: string): Promise<boolean> => {
+  try {
+    await apiClient.post(ENDPOINTS.ORDERS.CANCEL(orderId));
+    return true;
+  } catch (error) {
+    console.error('Failed to cancel order:', error);
+    return false;
+  }
+};
+
 export interface PaymentInitiateResponse {
   paymentId: string | number;
   amount: number;

@@ -17,7 +17,7 @@ export const CategoryRibbon: React.FC<CategoryRibbonProps> = ({
   return (
     <section className="w-full bg-surface-container-lowest sticky top-20 z-30 shadow-md border-b border-white/5">
       <div className="max-w-7xl mx-auto px-space-md lg:px-container-padding-desktop py-space-sm">
-        <div className="flex items-center justify-between gap-space-md overflow-x-auto no-scrollbar">
+        <div className="flex items-center justify-between gap-space-md overflow-x-auto">
           <div className="flex items-center gap-space-xs shrink-0" id="category-pills">
             <button
               type="button"

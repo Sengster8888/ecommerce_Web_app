@@ -34,6 +34,7 @@ export const ENDPOINTS = {
     CREATE: '/orders',
     DETAIL: (id: string) => `/orders/${id}`,
     TRACKING: (id: string) => `/orders/${id}/tracking`,
+    CANCEL: (id: string) => `/orders/${id}/cancel`,
   },
   ADDRESSES: {
     LIST: '/addresses',

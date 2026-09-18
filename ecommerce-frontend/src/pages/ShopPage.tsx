@@ -1,12 +1,11 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProducts, useCategories, usePopularProducts, useDiscountedProducts } from '../features/products/hooks/useProducts';
+import { useProducts, useCategories } from '../features/products/hooks/useProducts';
 import { fetchCart, addToCartApi } from '../features/cart/api/cart.api';
 import type { Product } from '../features/products/types/product.types';
 import { parsePrice } from '../utils/price.utils';
 
 import { StorefrontHeader } from '../components/storefront/StorefrontHeader';
-import { FeaturedProductsDeck } from '../components/storefront/FeaturedProductsDeck';
 import { CategoryRibbon } from '../components/storefront/CategoryRibbon';
 import { FilterControlDeck } from '../components/storefront/FilterControlDeck';
 import { ProductCard } from '../components/storefront/ProductCard';
@@ -15,12 +14,11 @@ import { ProductQuickViewModal } from '../components/storefront/ProductQuickView
 import { StorefrontFooter } from '../components/storefront/StorefrontFooter';
 import { ToastNotification } from '../components/storefront/ToastNotification';
 
-export const ProductsPage: React.FC = () => {
+export const ShopPage: React.FC = () => {
   const navigate = useNavigate();
   const { categories } = useCategories();
-  const { products, loading, error, params, setParams } = useProducts({ page: 1, limit: 50 });
-  const { products: popularProducts, loading: loadingPopular } = usePopularProducts(10);
-  const { products: discountedProducts, loading: loadingDiscounted } = useDiscountedProducts(10);
+  const { products, loading, error, params, setParams } = useProducts({ page: 1, limit: 16 });
+  
   // State management
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -132,8 +130,6 @@ export const ProductsPage: React.FC = () => {
     navigate('/checkout');
   };
 
-
-
   return (
     <div className="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col">
       {/* 1. Storefront Navigation Header */}
@@ -148,17 +144,17 @@ export const ProductsPage: React.FC = () => {
       />
 
       <main className="w-full pt-20 bg-surface flex-1 flex flex-col">
-        {/* 2. Featured Products Section */}
-        <FeaturedProductsDeck
-          popularProducts={popularProducts}
-          discountedProducts={discountedProducts}
-          loadingPopular={loadingPopular}
-          loadingDiscounted={loadingDiscounted}
-          onQuickView={(p) => setQuickViewProduct(p)}
-          onAddToCart={(p, qty) => handleAddToCart(p, qty)}
-        />
+        {/* Page Title & Breadcrumb for Shop */}
+        <div className="w-full max-w-7xl mx-auto px-space-md lg:px-container-padding-desktop pt-space-xl pb-space-sm">
+          <h1 className="font-headline-lg lg:text-display-md text-on-surface tracking-tight font-bold">
+            Shop Catalog
+          </h1>
+          <p className="font-body-md text-on-surface-variant max-w-2xl mt-space-2xs">
+            Browse our full range of purposeful electronics and find what you need.
+          </p>
+        </div>
 
-        {/* 3. Category Filter Pill Ribbon */}
+        {/* 2. Category Filter Pill Ribbon */}
         <CategoryRibbon
           categories={categories}
           selectedCategory={selectedCategory}
@@ -166,14 +162,14 @@ export const ProductsPage: React.FC = () => {
           totalProductsCount={displayProducts.length}
         />
 
-        {/* 4. Filter & Sorting Deck */}
+        {/* 3. Filter & Sorting Deck */}
         <FilterControlDeck
           params={params}
           onUpdateParams={(newP) => setParams((prev) => ({ ...prev, ...newP }))}
           totalCount={displayProducts.length}
         />
 
-        {/* 5. Product Catalog Showcase Grid */}
+        {/* 4. Product Catalog Showcase Grid */}
         <section className="w-full bg-surface py-space-lg pb-space-3xl flex-1">
           <div className="max-w-7xl mx-auto px-space-md lg:px-container-padding-desktop">
             {loading ? (
@@ -235,16 +231,14 @@ export const ProductsPage: React.FC = () => {
                 ))}
               </div>
             )}
-
-
           </div>
         </section>
       </main>
 
-      {/* 6. Cambodian Storefront Footer */}
+      {/* 5. Cambodian Storefront Footer */}
       <StorefrontFooter />
 
-      {/* 7. Product Quick Detail View Modal */}
+      {/* 6. Product Quick Detail View Modal */}
       <ProductQuickViewModal
         product={quickViewProduct}
         isOpen={Boolean(quickViewProduct)}
@@ -256,10 +250,10 @@ export const ProductsPage: React.FC = () => {
         onBuyNowKHQR={handleBuyNowKHQR}
       />
 
-      {/* 8. Toast Feedback Alert */}
+      {/* 7. Toast Feedback Alert */}
       <ToastNotification message={toastMessage} isVisible={isToastVisible} />
     </div>
   );
 };
 
-export default ProductsPage;
+export default ShopPage;

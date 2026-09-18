@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { StorefrontHeader } from '../components/storefront/StorefrontHeader';
 import { StorefrontFooter } from '../components/storefront/StorefrontFooter';
 import { ToastNotification } from '../components/storefront/ToastNotification';
 import { useOrderDetail, exchangeRate } from '../features/orders/hooks/useOrderDetail';
+import { cancelOrderApi } from '../features/orders/api/orders.api';
 import { parsePrice, formatKHR } from '../utils/price.utils';
 
 export const OrderDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const {
     order,
     paymentData,
@@ -30,6 +32,7 @@ export const OrderDetailPage: React.FC = () => {
 
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const prevPaidRef = useRef(isPaid);
 
   useEffect(() => {
@@ -366,13 +369,17 @@ export const OrderDetailPage: React.FC = () => {
                               <span className="material-symbols-outlined text-[20px]">link</span>
                               <span>{copiedText === 'link' ? 'Copied Link!' : 'Copy Link'}</span>
                             </button>
+                          </div>
+
+                          {/* Cancel back to Checkout */}
+                          <div className="w-full mt-space-md pt-space-xs flex justify-center">
                             <button
                               type="button"
-                              onClick={handleSimulatePaymentSuccess}
-                              className="w-full sm:flex-1 py-space-sm px-space-md rounded-xl bg-tertiary-container hover:bg-tertiary text-on-tertiary-container font-label-lg text-label-lg font-bold transition-all flex items-center justify-center gap-space-xs cursor-pointer shadow-md"
+                              onClick={() => setShowCancelModal(true)}
+                              className="text-on-surface-variant hover:text-error transition-colors hover:underline font-label-md text-label-md flex items-center gap-1 cursor-pointer bg-transparent border-none p-0"
                             >
-                              <span className="material-symbols-outlined text-[20px]">play_circle</span>
-                              <span>Simulate Paid</span>
+                              <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+                              Cancel Payment &amp; Return to Checkout
                             </button>
                           </div>
                         </div>
@@ -672,19 +679,48 @@ export const OrderDetailPage: React.FC = () => {
                   </a>
                 </div>
 
-                {/* Bottom Navigation / Cancel Link */}
-                <div className="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm px-space-2xs">
-                  <Link to="/orders" className="hover:text-error flex items-center gap-space-2xs transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-                    <span>Return to My Orders</span>
-                  </Link>
-                  <span className="text-outline">Encrypted &amp; Certified by NBC</span>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Cancel Payment Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+          <div className="relative w-full max-w-sm bg-surface-container-high border border-error/30 rounded-3xl p-6 shadow-[0_0_40px_rgba(239,68,68,0.15)] text-center space-y-5 animate-scaleUp">
+            <div className="mx-auto w-16 h-16 rounded-full bg-error/10 flex items-center justify-center">
+              <span className="material-symbols-outlined text-[32px] text-error">warning</span>
+            </div>
+            <div>
+              <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold mb-2">Cancel Payment?</h3>
+              <p className="font-body-md text-body-md text-on-surface-variant">
+                Are you sure you want to cancel this payment and return to checkout? Your cart items will be saved.
+              </p>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 py-3 px-4 rounded-xl bg-surface-container-highest hover:bg-surface-bright text-on-surface font-label-lg font-bold transition-all border border-white/5"
+              >
+                No, Go Back
+              </button>
+              <button
+                onClick={async () => {
+                  if (order?.id) {
+                    await cancelOrderApi(order.id.toString());
+                  }
+                  setShowCancelModal(false);
+                  navigate('/checkout');
+                }}
+                className="flex-1 py-3 px-4 rounded-xl bg-error hover:bg-error/90 text-on-error font-label-lg font-bold transition-all shadow-md"
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Payment Success Modal Popup */}
       {showSuccessModal && (

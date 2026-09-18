@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchProducts, fetchProductById, fetchCategories } from '../api/products.api';
+import { fetchProducts, fetchProductById, fetchCategories, fetchPopularProducts, fetchDiscountedProducts } from '../api/products.api';
 import type {
   Product,
   Category,
@@ -108,4 +108,52 @@ export function useProductDetail(id: string | number | null) {
   }, [id]);
 
   return { product, loading, error };
+}
+
+export function usePopularProducts(limit: number = 10) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    fetchPopularProducts(limit)
+      .then((res) => {
+        if (isMounted) setProducts(res || []);
+      })
+      .catch((err) => {
+        if (isMounted) setError(err?.message || 'Failed to fetch popular products');
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+    return () => { isMounted = false; };
+  }, [limit]);
+
+  return { products, loading, error };
+}
+
+export function useDiscountedProducts(limit: number = 10) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    fetchDiscountedProducts(limit)
+      .then((res) => {
+        if (isMounted) setProducts(res || []);
+      })
+      .catch((err) => {
+        if (isMounted) setError(err?.message || 'Failed to fetch discounted products');
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+    return () => { isMounted = false; };
+  }, [limit]);
+
+  return { products, loading, error };
 }

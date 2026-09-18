@@ -14,7 +14,7 @@ import {
 } from '../features/addresses/api/addresses.api';
 import { fetchMyOrdersApi, type OrderDetail } from '../features/orders/api/orders.api';
 import { submitProductRatingApi } from '../features/reviews/api/reviews.api';
-import { formatKHR, parsePrice } from '../utils/price.utils';
+import { parsePrice } from '../utils/price.utils';
 
 export const ProfilePage: React.FC = () => {
   const { user, refreshProfile } = useAuth();
@@ -71,6 +71,17 @@ export const ProfilePage: React.FC = () => {
   const [productComments, setProductComments] = useState<Record<string | number, string>>({});
   const [submittingReviewId, setSubmittingReviewId] = useState<string | number | null>(null);
   const [submittedReviewIds, setSubmittedReviewIds] = useState<Set<string | number>>(new Set());
+  
+  // Expanded Orders state for Order History (show 1 product by default)
+  const [expandedOrders, setExpandedOrders] = useState<Set<string | number>>(new Set());
+  const toggleOrderExpanded = (orderId: string | number) => {
+    setExpandedOrders(prev => {
+      const next = new Set(prev);
+      if (next.has(orderId)) next.delete(orderId);
+      else next.add(orderId);
+      return next;
+    });
+  };
 
   const handleItemRatingSubmit = async (productId: string | number, productName: string) => {
     const itemRating = productRatings[productId] || 5;
@@ -464,9 +475,6 @@ export const ProfilePage: React.FC = () => {
                     <span className="font-outfit font-bold text-xl text-white mt-1">
                       ${totalSpentUsd.toLocaleString()}
                     </span>
-                    <span className="text-xs text-[#908fa0] mt-0.5">
-                      ~{formatKHR(parsePrice(totalSpentUsd))}
-                    </span>
                   </div>
 
                   <div className="flex flex-col p-3 sm:p-4 rounded-xl bg-[#0a0e18]/80 border border-[#262a35] backdrop-blur-md shadow-md">
@@ -512,7 +520,11 @@ export const ProfilePage: React.FC = () => {
                 {/* Tab 2 */}
                 <button
                   type="button"
-                  onClick={() => setActiveTab('orders')}
+                  onClick={() => {
+                    setActiveTab('orders');
+                    setOrderStatusFilter('ALL');
+                    setOrderSearchQuery('');
+                  }}
                   className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-sans text-sm font-semibold transition-all ${
                     activeTab === 'orders'
                       ? 'bg-[#8083ff] text-white shadow-[0_0_20px_rgba(128,131,255,0.4)]'
@@ -688,16 +700,6 @@ export const ProfilePage: React.FC = () => {
                           Manage home, office, and provincial delivery dispatch locations.
                         </p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setIsAddAddressOpen(true)}
-                        className="px-3.5 py-2 rounded-lg bg-[#8083ff] text-white text-xs font-semibold shadow-[0_0_16px_rgba(128,131,255,0.3)] hover:brightness-110 transition-all flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">
-                          add_location_alt
-                        </span>
-                        Add New
-                      </button>
                     </div>
 
                     {/* Address List */}
@@ -991,7 +993,7 @@ export const ProfilePage: React.FC = () => {
 
                       {/* Items Sub-panel */}
                       <div className="bg-[#0a0e18]/70 border border-[#262a35] rounded-lg p-4 flex flex-col gap-4">
-                        {ord.items?.map((item) => (
+                        {(expandedOrders.has(ord.id) ? ord.items : ord.items?.slice(0, 1))?.map((item) => (
                           <div
                             key={item.id}
                             className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#262a35] last:border-b-0 pb-3 last:pb-0"
@@ -1015,12 +1017,28 @@ export const ProfilePage: React.FC = () => {
                               <span className="font-outfit font-bold text-sm text-white">
                                 ${parsePrice(item.unitPrice).toFixed(2)}
                               </span>
-                              <p className="text-[11px] text-[#908fa0]">
-                                ~{formatKHR(parsePrice(item.unitPrice))}
-                              </p>
                             </div>
                           </div>
                         ))}
+                        {ord.items && ord.items.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => toggleOrderExpanded(ord.id)}
+                            className="text-xs font-semibold text-[#8083ff] hover:text-[#9fa1ff] transition-colors flex items-center justify-center gap-1 w-full py-2 mt-1 rounded-md bg-[#8083ff]/5 hover:bg-[#8083ff]/15 cursor-pointer"
+                          >
+                            {expandedOrders.has(ord.id) ? (
+                              <>
+                                <span className="material-symbols-outlined text-[16px]">expand_less</span>
+                                Show Less
+                              </>
+                            ) : (
+                              <>
+                                <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                                Show {ord.items.length - 1} More Item{ord.items.length - 1 !== 1 ? 's' : ''}
+                              </>
+                            )}
+                          </button>
+                        )}
                       </div>
 
                       {/* Bottom Summary & Actions */}
@@ -1031,7 +1049,7 @@ export const ProfilePage: React.FC = () => {
                             ${parsePrice(ord.totalAmount).toFixed(2)}
                           </span>
                           <span className="text-xs text-[#908fa0]">
-                            (~{formatKHR(parsePrice(ord.totalAmount))} via KHQR)
+                            (via KHQR)
                           </span>
                         </div>
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { StorefrontHeader } from '../components/storefront/StorefrontHeader';
 import { StorefrontFooter } from '../components/storefront/StorefrontFooter';
 import { useCart, exchangeRate } from '../features/cart/hooks/useCart';
-import { parsePrice, formatKHR } from '../utils/price.utils';
+import { parsePrice } from '../utils/price.utils';
 
 export const CartPage: React.FC = () => {
   const {
@@ -14,7 +14,6 @@ export const CartPage: React.FC = () => {
     totalCount,
     discountAmount,
     grandTotalUsd,
-    grandTotalKhr,
     promoCode,
     setPromoCode,
     appliedPromo,
@@ -102,7 +101,6 @@ export const CartPage: React.FC = () => {
                   {cartItems.map((item) => {
                     const price = parsePrice(item.product?.price || 0);
                     const lineTotal = price * item.quantity;
-                    const lineKhr = formatKHR(lineTotal);
                     const isUpdating = String(updatingItemId) === String(item.id);
                     const imgUrl =
                       item.product?.images?.find((img: any) => img.isPrimary)?.imageUrl ||
@@ -177,9 +175,6 @@ export const CartPage: React.FC = () => {
                                 <div className="font-headline-md text-headline-md text-on-surface font-bold">
                                   ${lineTotal.toFixed(2)}
                                 </div>
-                                <div className="font-label-sm text-label-sm text-on-surface-variant font-mono">
-                                  ≈ {lineKhr} KHR
-                                </div>
                               </div>
                             </div>
                           </div>
@@ -225,69 +220,30 @@ export const CartPage: React.FC = () => {
 
             {/* Right Column (~35% - 4 Columns - Sticky Order Summary) */}
             <aside className="lg:col-span-4 lg:sticky lg:top-28 flex flex-col gap-space-md">
-              <div className="p-space-lg rounded-2xl bg-surface-container-low backdrop-blur-xl shadow-xl flex flex-col gap-space-md border border-white/5">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">Order Summary</h2>
-                  <span className="px-space-xs py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm">
-                    {totalCount} {totalCount === 1 ? 'Item' : 'Items'}
-                  </span>
-                </div>
-
-                {/* Price Calculation Lines */}
-                <div className="flex flex-col gap-space-xs font-body-md text-body-md text-on-surface-variant">
-                  <div className="flex items-center justify-between">
-                    <span>Subtotal (USD)</span>
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-semibold">
-                      ${subtotal.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-on-surface-variant/80">
-                    <span className="font-label-sm text-label-sm">Subtotal (KHR Reference)</span>
-                    <span className="font-label-sm text-label-sm font-mono">
-                      ≈ {formatKHR(subtotal * exchangeRate)} ៛
-                    </span>
-                  </div>
-
-                  {discountAmount > 0 && (
-                    <div className="flex items-center justify-between text-tertiary">
-                      <span className="font-label-md text-label-md font-semibold">Voucher Discount</span>
-                      <span className="font-mono font-bold">-${discountAmount.toFixed(2)}</span>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between">
-                    <span>Estimated Tax &amp; MOC Fee</span>
-                    <span className="text-on-surface font-medium">$0.00 (Included)</span>
-                  </div>
-                </div>
-
-                {/* Promo Code Input / Applied Badge */}
-                <div className="bg-surface-container rounded-xl p-space-sm border border-white/5 space-y-space-xs">
-                  <div className="flex items-center gap-space-xs">
-                    <span className="material-symbols-outlined text-secondary text-[18px]">sell</span>
-                    <span className="font-label-md text-label-md text-on-surface font-semibold">Store Voucher</span>
-                  </div>
-                  <div className="flex items-center gap-space-xs">
-                    <input
-                      type="text"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value)}
-                      placeholder="Coupon Code"
-                      className="flex-1 h-9 px-space-xs rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm uppercase font-mono tracking-wider focus:outline-none border border-white/10"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleApplyPromo}
-                      className="h-9 px-space-md rounded-lg bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-semibold hover:bg-surface-bright transition-colors cursor-pointer"
-                    >
-                      Apply
-                    </button>
-                  </div>
+              {/* Card 1: Coupon Code */}
+              <div className="p-space-lg rounded-2xl bg-surface-container-low backdrop-blur-xl shadow-xl flex flex-col border border-white/5">
+                <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-sm">Coupon Code</h2>
+                <div className="h-px bg-white/10 w-full mb-space-md"></div>
+                <div className="flex flex-col gap-space-sm">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    placeholder="Enter Your Coupon Code"
+                    className="w-full h-11 px-space-sm rounded-lg bg-surface-container-highest text-on-surface font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/50"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyPromo}
+                    className="w-full h-11 rounded-lg border border-primary text-primary font-label-md text-label-md font-semibold hover:bg-primary/10 transition-colors cursor-pointer"
+                  >
+                    Apply Your Coupon
+                  </button>
                   {promoError && (
-                    <p className="text-xs text-error font-body-sm">{promoError}</p>
+                    <p className="text-xs text-error font-body-sm text-center">{promoError}</p>
                   )}
                   {appliedPromo && (
-                    <div className="flex items-center justify-between px-space-xs py-1 rounded bg-tertiary/15 text-tertiary font-label-sm text-label-sm">
+                    <div className="mt-space-2xs flex items-center justify-between px-space-xs py-1 rounded bg-tertiary/15 text-tertiary font-label-sm text-label-sm">
                       <span className="font-mono font-semibold">'{appliedPromo}' APPLIED (-${discountAmount.toFixed(2)})</span>
                       <button
                         type="button"
@@ -299,34 +255,48 @@ export const CartPage: React.FC = () => {
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Total Highlight Box */}
-                <div className="p-space-md rounded-xl bg-surface-container-high flex flex-col gap-1 shadow-inner border border-white/5">
-                  <div className="flex items-baseline justify-between">
-                    <span className="font-label-lg text-label-lg text-on-surface uppercase tracking-wider font-semibold">
-                      Grand Total
-                    </span>
-                    <div className="text-right">
-                      <div className="font-display-hero text-headline-lg lg:text-price-hero text-primary font-bold tracking-tight">
-                        ${grandTotalUsd.toFixed(2)}
-                      </div>
-                      <div className="font-label-md text-label-md text-secondary font-medium font-mono">
-                        ≈ {grandTotalKhr.toLocaleString()} KHR (៛)
-                      </div>
-                    </div>
+              {/* Card 2: Order Summary */}
+              <div className="p-space-lg rounded-2xl bg-surface-container-low backdrop-blur-xl shadow-xl flex flex-col border border-white/5">
+                <div className="flex items-center justify-between mb-space-sm">
+                  <h2 className="font-headline-sm text-headline-sm text-on-surface font-semibold">Order Summary</h2>
+                </div>
+                <div className="h-px bg-white/10 w-full mb-space-md"></div>
+                
+                <div className="flex flex-col gap-space-sm font-body-md text-body-md text-on-surface-variant mb-space-md">
+                  <div className="flex items-center justify-between">
+                    <span>Discount</span>
+                    <span className="font-semibold text-on-surface">${discountAmount.toFixed(2)}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span>Delivery</span>
+                    <span className="font-semibold text-on-surface">$0.00</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span>Tax</span>
+                    <span className="font-semibold text-on-surface">$0.00</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-space-sm border-t border-white/10 mb-space-lg">
+                  <span className="font-body-md text-body-md text-on-surface-variant">Total</span>
+                  <div className="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">
+                    ${grandTotalUsd.toFixed(2)}
                   </div>
                 </div>
 
                 {/* CTA Buttons */}
-                <div className="flex flex-col gap-space-xs pt-space-xs">
+                <div className="flex flex-col gap-space-xs">
                   {cartItems.length > 0 ? (
                     <Link
                       to="/checkout"
                       state={{ promoCode: appliedPromo || promoCode, appliedPromo, discountAmount }}
-                      className="w-full h-12 rounded-xl bg-primary-container text-on-primary-container font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-xs hover:opacity-95 shadow-[0_0_24px_rgba(99,102,241,0.35)] transition-all"
+                      className="w-full h-12 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-space-xs hover:bg-primary-fixed transition-all"
                     >
-                      <span className="material-symbols-outlined text-lg">lock</span>
-                      <span>Proceed to Checkout • ${grandTotalUsd.toFixed(2)}</span>
+                      <span>Proceed to Checkout</span>
                     </Link>
                   ) : (
                     <button
@@ -340,7 +310,7 @@ export const CartPage: React.FC = () => {
                 </div>
 
                 {/* Cambodian Payment Trust Badges */}
-                <div className="pt-space-xs flex flex-col gap-space-2xs">
+                <div className="pt-space-md flex flex-col gap-space-2xs mt-space-md border-t border-white/5">
                   <div className="font-label-sm text-label-sm text-on-surface-variant text-center uppercase tracking-wider font-semibold">
                     Accepted Cambodian Gateways
                   </div>
@@ -351,7 +321,6 @@ export const CartPage: React.FC = () => {
                     <span className="px-2 py-1 rounded bg-surface-container-highest font-label-sm text-label-sm text-on-surface font-medium">ABA PAY</span>
                     <span className="px-2 py-1 rounded bg-surface-container-highest font-label-sm text-label-sm text-on-surface font-medium">Wing Bank</span>
                     <span className="px-2 py-1 rounded bg-surface-container-highest font-label-sm text-label-sm text-on-surface font-medium">ACLEDA</span>
-                    <span className="px-2 py-1 rounded bg-surface-container-highest font-label-sm text-label-sm text-on-surface font-medium">Visa / MC</span>
                     <span className="px-2 py-1 rounded bg-surface-container-highest font-label-sm text-label-sm text-secondary font-medium">COD (Phnom Penh)</span>
                   </div>
                 </div>

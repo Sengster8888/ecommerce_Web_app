@@ -65,3 +65,17 @@ export const fetchCategories = async (): Promise<Category[]> => {
   const response = await apiClient.get<Category[]>(ENDPOINTS.PRODUCTS.CATEGORIES);
   return response.data;
 };
+
+export const fetchPopularProducts = async (limit: number = 10): Promise<Product[]> => {
+  const response = await apiClient.get<Product[]>(`${ENDPOINTS.PRODUCTS.LIST}/popular`, {
+    params: { limit },
+  });
+  return response.data;
+};
+
+export const fetchDiscountedProducts = async (limit: number = 10): Promise<Product[]> => {
+  const response = await apiClient.get<Product[]>(`${ENDPOINTS.PRODUCTS.LIST}/discounted`, {
+    params: { limit },
+  });
+  return response.data;
+};

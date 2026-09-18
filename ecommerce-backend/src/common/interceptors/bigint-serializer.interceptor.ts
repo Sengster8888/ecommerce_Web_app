@@ -24,6 +24,10 @@ export class BigIntSerializerInterceptor implements NestInterceptor {
       return obj.toString(); // Safely convert BigInt to string for frontend JSON compliance
     }
 
+    if (obj instanceof Date) {
+      return obj.toISOString();
+    }
+
     if (Array.isArray(obj)) {
       return obj.map((item) => this.serialize(item));
     }

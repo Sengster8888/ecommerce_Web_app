@@ -181,10 +181,13 @@ export class OrdersService {
         },
       });
 
-      // 7. Clear Shopping Cart Items upon successful transaction
-      await tx.cartItem.deleteMany({
-        where: { cartId: cart.id },
-      });
+      // 7. Clear Shopping Cart Items immediately only if order is CONFIRMED (e.g. COD).
+      // For KHQR (PENDING), cart will be cleared via webhook upon successful payment.
+      if (initialStatus === 'CONFIRMED') {
+        await tx.cartItem.deleteMany({
+          where: { cartId: cart.id },
+        });
+      }
 
       return order;
     });
@@ -207,7 +210,15 @@ export class OrdersService {
     return this.prisma.order.findMany({
       where: { userId },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: {
+              include: {
+                images: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -217,13 +228,65 @@ export class OrdersService {
     return this.prisma.order.findFirst({
       where: { id: orderId, userId },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: {
+              include: {
+                images: true,
+              },
+            },
+          },
+        },
         address: true,
         payments: true,
         orderTracking: {
           orderBy: { createdAt: 'asc' },
         },
       },
+    });
+  }
+
+  async cancelOrder(orderId: bigint, userId: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findFirst({
+        where: { id: orderId, userId },
+        include: { items: true },
+      });
+
+      if (!order) {
+        throw new NotFoundException('Order not found.');
+      }
+
+      if (order.status !== 'PENDING') {
+        throw new BadRequestException('Only pending orders can be cancelled.');
+      }
+
+      // 1. Update order status
+      const updatedOrder = await tx.order.update({
+        where: { id: order.id },
+        data: { status: 'CANCELLED' },
+      });
+
+      // 2. Fail any pending payment records
+      await tx.payment.updateMany({
+        where: { orderId: order.id, status: 'PENDING' },
+        data: { status: 'FAILED' },
+      });
+
+      // 3. Restore product stock
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { increment: item.quantity },
+            status: 'active', // Ensure it's active if it was previously out of stock
+          },
+        });
+      }
+
+      // 4. Cart restoration is no longer needed since PENDING orders (KHQR) do not clear the cart until successful payment.
+
+      return updatedOrder;
     });
   }
 }

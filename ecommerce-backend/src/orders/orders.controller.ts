@@ -31,4 +31,10 @@ export class OrdersController {
     }
     return order;
   }
+
+  @Post(':id/cancel')
+  async cancelOrder(@Req() req: Request, @Param('id') id: string) {
+    const userId = (req.user as any).id;
+    return this.ordersService.cancelOrder(BigInt(id), userId);
+  }
 }

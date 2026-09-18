@@ -26,6 +26,16 @@ export class ProductsController {
     });
   }
 
+  @Get('popular')
+  async getPopularProducts(@Query('limit') limit = '10') {
+    return this.productsService.findPopular(parseInt(limit, 10));
+  }
+
+  @Get('discounted')
+  async getDiscountedProducts(@Query('limit') limit = '10') {
+    return this.productsService.findDiscounted(parseInt(limit, 10));
+  }
+
   @Get('slug/:slug')
   async getProductBySlug(@Param('slug') slug: string) {
     return this.productsService.findBySlug(slug);

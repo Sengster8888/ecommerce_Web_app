@@ -50,10 +50,16 @@ export const StorefrontHeader: React.FC<StorefrontHeaderProps> = ({
 
           <nav className="hidden xl:flex items-center gap-1.5">
             <Link
-              to="/products"
+              to="/"
               className="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium transition-all rounded-lg"
             >
-              Storefront
+              Home
+            </Link>
+            <Link
+              to="/shop"
+              className="px-3 py-1.5 text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium transition-all rounded-lg"
+            >
+              Shop
             </Link>
             <Link
               to="/orders"

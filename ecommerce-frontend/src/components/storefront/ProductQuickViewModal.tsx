@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Product } from '../../features/products/types/product.types';
-import { parsePrice, formatKHR } from '../../utils/price.utils';
+import { parsePrice } from '../../utils/price.utils';
 
 interface ProductQuickViewModalProps {
   product: Product | null;
@@ -35,7 +35,6 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
 
   const priceNum = parsePrice(product.price);
   const origPriceNum = (priceNum * 1.18).toFixed(2);
-  const khrPrice = formatKHR(priceNum);
 
   const galleryImages =
     product.images && product.images.length > 0
@@ -123,21 +122,14 @@ export const ProductQuickViewModal: React.FC<ProductQuickViewModalProps> = ({
                 {product.name}
               </h2>
 
-              {/* Price Display (USD & KHR) */}
-              <div className="p-space-sm rounded-lg bg-surface-container flex items-baseline justify-between border border-white/5">
-                <div>
-                  <span className="font-price-hero text-price-hero text-secondary font-bold">
-                    ${priceNum.toFixed(2)}
-                  </span>
-                  <span className="ml-2 font-body-sm text-body-sm text-outline line-through">
-                    ${origPriceNum}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="font-label-md text-label-md text-tertiary font-bold">
-                    ៛ {khrPrice} KHR
-                  </span>
-                </div>
+              {/* Price Display (USD) */}
+              <div className="p-space-sm rounded-lg bg-surface-container flex items-baseline border border-white/5">
+                <span className="font-price-hero text-price-hero text-secondary font-bold">
+                  ${priceNum.toFixed(2)}
+                </span>
+                <span className="ml-2 font-body-sm text-body-sm text-outline line-through">
+                  ${origPriceNum}
+                </span>
               </div>
 
               <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">

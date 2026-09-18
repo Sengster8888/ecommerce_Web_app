@@ -193,39 +193,17 @@ export class PaymentsService {
       });
 
       const order = payment.order;
-      for (const item of order.items) {
-        // Atomic stock check and decrement
-        const updatedProduct = await tx.product.updateMany({
-          where: {
-            id: item.productId,
-            stock: { gte: item.quantity },
-          },
-          data: {
-            stock: { decrement: item.quantity },
-          },
+      
+      // Clear the user's cart upon successful payment completion
+      const cart = await tx.cart.findUnique({
+        where: { userId: order.userId },
+      });
+      if (cart) {
+        // Delete only the items that were in this order, OR just clear the cart entirely.
+        // Clearing entirely is standard since they checked out with the whole cart.
+        await tx.cartItem.deleteMany({
+          where: { cartId: cart.id },
         });
-
-        // If stock is insufficient
-        if (updatedProduct.count === 0) {
-          await tx.order.update({
-            where: { id: order.id },
-            data: { status: 'PENDING' },
-          });
-
-          await tx.orderTracking.create({
-            data: {
-              orderId: order.id,
-              status: 'PENDING',
-              note: `Stock depleted for product ID ${item.productId} during payment window. Needs manual review.`,
-            },
-          });
-
-          return {
-            payment: updatedPayment,
-            orderStatus: 'PENDING',
-            warning: 'Payment received but stock depleted. Order held in review state.',
-          };
-        }
       }
 
       // Confirm order

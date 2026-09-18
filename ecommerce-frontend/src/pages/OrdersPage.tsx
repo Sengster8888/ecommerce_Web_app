@@ -21,7 +21,7 @@ export const OrdersPage: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
   const [trackingTimeline, setTrackingTimeline] = useState<TrackingTimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false);
   // Load tracking timeline from GET /api/orders/:id/tracking
   const loadTrackingTimeline = async (orderId: string | number) => {
     try {
@@ -41,7 +41,7 @@ export const OrdersPage: React.FC = () => {
     setLoading(true);
     try {
       const orderList = await fetchMyOrdersApi();
-      const confirmedOrders = orderList.filter((o) => o.status !== 'PENDING');
+      const confirmedOrders = orderList.filter((o) => o.status === 'CONFIRMED');
       setOrders(confirmedOrders);
 
       if (confirmedOrders.length > 0) {
@@ -106,12 +106,21 @@ export const OrdersPage: React.FC = () => {
     }
   };
 
-  // Helper for fetching tracking timeline event info for a status
   const getStepTrackingInfo = (statusKey: string) => {
     const event = trackingTimeline.find((t) => t.status.toUpperCase() === statusKey.toUpperCase());
     if (event) {
-      const formattedTime = new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const formattedDate = new Date(event.timestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      // Safely check if timestamp is a valid date string/number, not an empty object
+      const isObjectOrEmpty = typeof event.timestamp === 'object' || !event.timestamp;
+      const parsedDate = new Date(event.timestamp);
+      const isValidDate = !isObjectOrEmpty && !isNaN(parsedDate.getTime());
+
+      const formattedTime = isValidDate 
+        ? parsedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+        : '';
+      const formattedDate = isValidDate 
+        ? parsedDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) 
+        : '';
+
       return { note: event.note, time: formattedTime, date: formattedDate, fullTimestamp: event.timestamp };
     }
     return null;
@@ -234,8 +243,7 @@ export const OrdersPage: React.FC = () => {
                     Order <span className="text-secondary font-mono">{orderNumDisplay}</span>
                   </h1>
                   <p className="font-body-md text-body-md text-on-surface-variant">
-                    Placed on {new Date(selectedOrder.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} • Verified through{' '}
-                    <span className="text-tertiary font-medium">Bakong KHQR (ABA Bank KHQR)</span>
+                    Placed on {new Date(selectedOrder.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </p>
                 </div>
               </div>
@@ -274,13 +282,14 @@ export const OrdersPage: React.FC = () => {
                     <div className="w-10 h-10 rounded-full bg-tertiary/20 text-tertiary flex items-center justify-center shadow-[0_0_16px_rgba(78,222,163,0.3)]">
                       <span className="material-symbols-outlined text-[20px]">shopping_cart_checkout</span>
                     </div>
-                    <span className="font-label-sm text-label-sm text-tertiary font-mono">
-                      {getStepTrackingInfo('PENDING')?.time || 'Step 01'}
+                    <span className="font-label-sm text-label-sm text-tertiary font-mono flex flex-col items-end">
+                      <span>{getStepTrackingInfo('PENDING')?.time || 'Step 01'}</span>
+                      {getStepTrackingInfo('PENDING')?.date && <span className="text-[10px] opacity-75">{getStepTrackingInfo('PENDING')?.date}</span>}
                     </span>
                   </div>
                   <div className="font-label-lg text-label-lg text-on-surface font-semibold">1. Order Placed</div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    {getStepTrackingInfo('PENDING')?.note || 'Web checkout initiated. Cart verified & items locked.'}
+                    {getStepTrackingInfo('PENDING')?.note || 'Order placed.'}
                   </p>
                   <div className="pt-space-2xs">
                     <span className="font-label-sm text-label-sm px-space-xs py-space-2xs rounded bg-surface-container-high text-on-surface-variant font-medium">
@@ -301,13 +310,14 @@ export const OrdersPage: React.FC = () => {
                       }`}>
                       <span className="material-symbols-outlined text-[20px]">verified</span>
                     </div>
-                    <span className="font-label-sm text-label-sm text-tertiary font-mono">
-                      {getStepTrackingInfo('CONFIRMED')?.time || 'Step 02'}
+                    <span className="font-label-sm text-label-sm text-tertiary font-mono flex flex-col items-end">
+                      <span>{getStepTrackingInfo('CONFIRMED')?.time || 'Step 02'}</span>
+                      {getStepTrackingInfo('CONFIRMED')?.date && <span className="text-[10px] opacity-75">{getStepTrackingInfo('CONFIRMED')?.date}</span>}
                     </span>
                   </div>
                   <div className="font-label-lg text-label-lg text-on-surface font-semibold">2. Payment Verified</div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    {getStepTrackingInfo('CONFIRMED')?.note || 'Bakong KHQR zero-fee settlement via ABA Bank KHQR.'}
+                    {getStepTrackingInfo('CONFIRMED')?.note || 'Payment verified.'}
                   </p>
                   <div className="pt-space-2xs">
                     <span className={`font-label-sm text-label-sm px-space-xs py-space-2xs rounded ${getStepStatus(selectedOrder.status, 'verified')
@@ -331,13 +341,14 @@ export const OrdersPage: React.FC = () => {
                       }`}>
                       <span className="material-symbols-outlined text-[20px]">inventory_2</span>
                     </div>
-                    <span className="font-label-sm text-label-sm text-tertiary font-mono">
-                      {getStepTrackingInfo('PROCESSING')?.time || 'Step 03'}
+                    <span className="font-label-sm text-label-sm text-tertiary font-mono flex flex-col items-end">
+                      <span>{getStepTrackingInfo('PROCESSING')?.time || 'Step 03'}</span>
+                      {getStepTrackingInfo('PROCESSING')?.date && <span className="text-[10px] opacity-75">{getStepTrackingInfo('PROCESSING')?.date}</span>}
                     </span>
                   </div>
                   <div className="font-label-lg text-label-lg text-on-surface font-semibold">3. Processing</div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    {getStepTrackingInfo('PROCESSING')?.note || 'Sensok Central Hub. Tamper-evident seals applied & QC approved.'}
+                    {getStepTrackingInfo('PROCESSING')?.note || 'Order is being processed.'}
                   </p>
                 </div>
 
@@ -363,14 +374,15 @@ export const OrdersPage: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <span className={`font-label-sm text-label-sm font-semibold ${selectedOrder.status === 'SHIPPED' ? 'text-secondary' : 'text-outline'
+                    <span className={`font-label-sm text-label-sm flex flex-col items-end ${selectedOrder.status === 'SHIPPED' ? 'text-secondary font-semibold' : 'text-outline font-mono'
                       }`}>
-                      {selectedOrder.status === 'SHIPPED' ? 'Active' : getStepTrackingInfo('SHIPPED')?.time || 'Step 04'}
+                      <span>{selectedOrder.status === 'SHIPPED' && !getStepTrackingInfo('SHIPPED') ? 'Active' : getStepTrackingInfo('SHIPPED')?.time || 'Step 04'}</span>
+                      {getStepTrackingInfo('SHIPPED')?.date && <span className="text-[10px] font-mono opacity-75">{getStepTrackingInfo('SHIPPED')?.date}</span>}
                     </span>
                   </div>
                   <div className="font-label-lg text-label-lg text-on-surface font-semibold">4. Shipped (En Route)</div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    {getStepTrackingInfo('SHIPPED')?.note || 'Courier Mr. Vireak en route to destination sector.'}
+                    {getStepTrackingInfo('SHIPPED')?.note || 'Order has been shipped.'}
                   </p>
                 </div>
 
@@ -386,13 +398,14 @@ export const OrdersPage: React.FC = () => {
                       }`}>
                       <span className="material-symbols-outlined text-[20px]">home_pin</span>
                     </div>
-                    <span className="font-label-sm text-label-sm text-outline font-mono">
-                      {getStepTrackingInfo('DELIVERED')?.time || 'Step 05'}
+                    <span className="font-label-sm text-label-sm text-outline font-mono flex flex-col items-end">
+                      <span>{getStepTrackingInfo('DELIVERED')?.time || 'Step 05'}</span>
+                      {getStepTrackingInfo('DELIVERED')?.date && <span className="text-[10px] opacity-75">{getStepTrackingInfo('DELIVERED')?.date}</span>}
                     </span>
                   </div>
                   <div className="font-label-lg text-label-lg text-on-surface font-semibold">5. Delivered</div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    {getStepTrackingInfo('DELIVERED')?.note || 'Signature & contactless snapshot confirmation required at doorstep.'}
+                    {getStepTrackingInfo('DELIVERED')?.note || 'Order has been delivered.'}
                   </p>
                 </div>
               </div>
@@ -432,70 +445,68 @@ export const OrdersPage: React.FC = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Purchased Items Summary */}
-                <div className="rounded-xl bg-surface-container p-space-lg shadow-xl space-y-space-md border border-white/5">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-headline-sm text-headline-sm text-on-surface flex items-center gap-space-xs font-bold">
-                      <span className="material-symbols-outlined text-primary text-[22px]">inventory</span>
-                      Consolidated Package ({selectedOrder.items?.length || 0} Items)
-                    </h3>
-                    <span className="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low px-space-xs py-space-2xs rounded font-medium">
-                      Express Courier Sealed
-                    </span>
+                {/* Purchased Items List */}
+                <div className="rounded-xl bg-surface-container p-space-lg shadow-xl border border-white/5 space-y-space-sm">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-space-sm">
+                    <div className="flex items-center gap-space-xs text-secondary">
+                      <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
+                      <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">Purchased Items ({selectedOrder.items?.length || 0})</h3>
+                    </div>
                   </div>
-
-                  {/* Items Stack */}
-                  <div className="space-y-space-sm">
-                    {selectedOrder.items?.map((item) => {
+                  <div className="space-y-space-md max-h-72 overflow-y-auto pr-1 pt-space-xs">
+                    {(isItemsExpanded ? selectedOrder.items : selectedOrder.items?.slice(0, 1))?.map((item: any) => {
                       const uPrice = parsePrice(item.unitPrice);
                       const lTotal = parsePrice(item.lineTotal || uPrice * item.quantity);
                       const imgUrl =
-                        item.product?.images?.find((img) => img.isPrimary)?.imageUrl ||
+                        item.product?.images?.find((img: any) => img.isPrimary)?.imageUrl ||
                         item.product?.images?.[0]?.imageUrl ||
                         'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&auto=format&fit=crop&q=80';
 
                       return (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-space-md p-space-sm rounded-xl bg-surface-container-low hover:bg-surface-container-high transition-colors border border-white/5"
-                        >
+                        <div key={item.id} className="flex items-center gap-space-md">
                           <img
                             src={imgUrl}
                             alt={item.productNameSnapshot}
-                            className="w-16 h-16 rounded-lg object-cover bg-surface-container-lowest shrink-0 border border-white/5"
+                            className="w-16 h-16 rounded-lg object-cover bg-surface-container-lowest shrink-0 border border-white/5 shadow-sm"
                           />
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-label-lg text-label-lg text-on-surface font-semibold truncate">
+                            <h5 className="font-headline-sm text-headline-sm text-on-surface font-semibold truncate">
                               {item.productNameSnapshot}
-                            </h4>
-                            <div className="flex flex-wrap items-center gap-x-space-sm gap-y-1 font-body-sm text-body-sm text-on-surface-variant mt-0.5">
-                              <span className="text-tertiary">Qty: {item.quantity}</span>
-                              <span>• Unit: ${uPrice.toFixed(2)}</span>
-                            </div>
+                            </h5>
+                            <p className="font-body-sm text-body-sm text-on-surface-variant">
+                              Qty: {item.quantity} • ${uPrice.toFixed(2)}
+                            </p>
                           </div>
                           <div className="text-right shrink-0">
-                            <div className="font-price-card text-price-card text-secondary font-bold">
+                            <div className="font-price-card text-price-card text-on-surface font-bold">
                               ${lTotal.toFixed(2)}
                             </div>
-                            <span className="font-label-sm text-label-sm text-on-surface-variant font-mono">
+                            <div className="font-label-sm text-label-sm text-outline font-mono">
                               {formatKHR(lTotal * exchangeRate)} ៛
-                            </span>
+                            </div>
                           </div>
                         </div>
                       );
                     })}
-                  </div>
-
-                  {/* Total Calculation Row */}
-                  <div className="pt-space-sm border-t border-white/5 flex items-center justify-between text-on-surface-variant font-body-md text-body-md">
-                    <span>Subtotal &amp; Express Local Shipping:</span>
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">
-                      Total: ${totalUsd.toFixed(2)} USD{' '}
-                      <span className="text-secondary font-mono font-normal">
-                        ({totalKhr.toLocaleString()} KHR)
-                      </span>
-                    </span>
+                    {selectedOrder.items && selectedOrder.items.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setIsItemsExpanded(!isItemsExpanded)}
+                        className="text-xs font-semibold text-secondary hover:text-secondary-fixed-dim transition-colors flex items-center justify-center gap-1 w-full py-2 mt-1 rounded-md bg-secondary/5 hover:bg-secondary/15 cursor-pointer"
+                      >
+                        {isItemsExpanded ? (
+                          <>
+                            <span className="material-symbols-outlined text-[16px]">expand_less</span>
+                            Show Less
+                          </>
+                        ) : (
+                          <>
+                            <span className="material-symbols-outlined text-[16px]">expand_more</span>
+                            Show {selectedOrder.items.length - 1} More Item{selectedOrder.items.length - 1 !== 1 ? 's' : ''}
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

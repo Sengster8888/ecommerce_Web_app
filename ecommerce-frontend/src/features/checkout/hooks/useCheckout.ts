@@ -24,6 +24,7 @@ export const useCheckout = () => {
   const [paymentMethod, setPaymentMethod] = useState<CheckoutPaymentMethod>('khqr');
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [validPromoCode, setValidPromoCode] = useState<string | null>(null);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [promoError, setPromoError] = useState<string | null>(null);
 
@@ -92,11 +93,13 @@ export const useCheckout = () => {
           const result = await validateDiscountApi(code, cartSubtotal, itemsContext);
           if (result && (result.isValid || result.discountAmount > 0)) {
             setAppliedPromo(code.toUpperCase());
+            setValidPromoCode(code.toUpperCase());
             setDiscountAmount(result.discountAmount);
           } else {
             const autoRes = await validateDiscountApi('', cartSubtotal, itemsContext);
             if (autoRes && autoRes.discountAmount > 0) {
               setAppliedPromo(autoRes.code || autoRes.name || 'STORE_VOUCHER');
+              setValidPromoCode(autoRes.code || null);
               setDiscountAmount(autoRes.discountAmount);
             }
           }
@@ -104,6 +107,7 @@ export const useCheckout = () => {
           const autoRes = await validateDiscountApi('', cartSubtotal, itemsContext);
           if (autoRes && autoRes.discountAmount > 0) {
             setAppliedPromo(autoRes.code || autoRes.name || 'STORE_VOUCHER');
+            setValidPromoCode(autoRes.code || null);
             setDiscountAmount(autoRes.discountAmount);
           }
         }
@@ -149,6 +153,7 @@ export const useCheckout = () => {
     const result = await validateDiscountApi(promoCode.trim(), subtotal, itemsContext);
     if (result.isValid || result.discountAmount > 0) {
       setAppliedPromo(promoCode.trim().toUpperCase());
+      setValidPromoCode(promoCode.trim().toUpperCase());
       setDiscountAmount(result.discountAmount);
       setPromoError(null);
     } else {
@@ -158,6 +163,7 @@ export const useCheckout = () => {
 
   const handleRemovePromo = () => {
     setAppliedPromo(null);
+    setValidPromoCode(null);
     setDiscountAmount(0);
     setPromoCode('');
     setPromoError(null);
@@ -215,7 +221,7 @@ export const useCheckout = () => {
       const order = await submitCheckoutApi({
         addressId: selectedAddressId,
         paymentMethod,
-        promoCode: appliedPromo || undefined,
+        promoCode: validPromoCode || undefined,
       });
 
       // Redirect to Order Detail / Confirmation page

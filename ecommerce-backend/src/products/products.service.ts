@@ -108,6 +108,50 @@ export class ProductsService {
     };
   }
 
+  async findPopular(limit: number) {
+    const rawData = await this.prisma.product.findMany({
+      where: { status: 'active' },
+      take: limit,
+      include: {
+        images: { orderBy: { sortOrder: 'asc' } },
+        category: true,
+        reviews: { select: { rating: true } },
+      },
+      orderBy: {
+        reviews: {
+          _count: 'desc',
+        },
+      },
+    });
+    return rawData.map((p) => this.formatProduct(p));
+  }
+
+  async findDiscounted(limit: number) {
+    const now = new Date();
+    const rawData = await this.prisma.product.findMany({
+      where: {
+        status: 'active',
+        discountProducts: {
+          some: {
+            discount: {
+              isActive: true,
+              startDate: { lte: now },
+              endDate: { gte: now },
+            },
+          },
+        },
+      },
+      take: limit,
+      include: {
+        images: { orderBy: { sortOrder: 'asc' } },
+        category: true,
+        reviews: { select: { rating: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return rawData.map((p) => this.formatProduct(p));
+  }
+
   async findOne(id: bigint) {
     const product = await this.prisma.product.findUnique({
       where: { id },

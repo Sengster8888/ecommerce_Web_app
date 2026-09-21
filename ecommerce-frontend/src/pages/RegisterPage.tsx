@@ -25,9 +25,6 @@ export const RegisterPage: React.FC = () => {
                 Kroma Store
               </span>
             </Link>
-            <span className="hidden sm:inline-block ml-2 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
-              Auth Portal
-            </span>
           </div>
 
           <nav className="hidden lg:flex items-center gap-3">
@@ -77,120 +74,9 @@ export const RegisterPage: React.FC = () => {
       {/* Main Viewport Content */}
       <main className="w-full pt-20 pb-12 flex-1 relative z-10 bg-transparent flex flex-col justify-center">
         <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 lg:py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start min-h-[calc(100vh-11rem)]">
-            {/* Left Benefit Column (5 Cols Desktop) */}
-            <div className="lg:col-span-5 flex flex-col gap-6">
-              {/* Overhead Label & Subhead */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                  <span className="font-label-sm text-label-sm text-secondary tracking-widest uppercase font-semibold">
-                    E-Store VIP Privilege
-                  </span>
-                </div>
-                <h2 className="font-headline-lg text-headline-lg text-on-surface">
-                  Unlock Next-Gen Retail in Cambodia
-                </h2>
-                <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                  Connect directly with Phnom Penh &amp; Siem Reap fulfillment hubs. Enjoy guaranteed authenticity, instant automated settlements, and dedicated regional support.
-                </p>
-              </div>
-
-              {/* Media Feature Card */}
-              <div className="relative overflow-hidden rounded-2xl bg-surface-container-low border border-white/5 shadow-xl p-5 flex flex-col gap-4">
-                <div className="relative h-44 w-full rounded-xl overflow-hidden bg-surface-container-high flex items-center justify-center">
-                  {/* Decorative High-Tech Storefront SVG Header */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-container/30 via-secondary-container/20 to-surface-container-lowest flex items-center justify-center p-6 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="material-symbols-outlined text-secondary text-[48px]">
-                        workspace_premium
-                      </span>
-                      <span className="font-headline-sm text-headline-sm text-on-surface">
-                        Authorized Cambodian Retail Network
-                      </span>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-full bg-surface-container-highest/80 backdrop-blur-md text-tertiary font-label-sm text-label-sm flex items-center gap-1.5 shadow-sm border border-white/5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Verified Merchant Fleet
-                    </span>
-                    <span className="font-label-sm text-label-sm text-on-surface-variant font-mono">
-                      KH-855 Gateway
-                    </span>
-                  </div>
-                </div>
-
-                {/* Feature Benefit Stack */}
-                <div className="flex flex-col gap-3">
-                  {/* Benefit 1 */}
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors border border-white/5">
-                    <div className="w-10 h-10 rounded-lg bg-tertiary-container/30 flex items-center justify-center shrink-0 text-tertiary shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">payments</span>
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-headline-sm text-headline-sm text-on-surface">
-                          5% Bakong KHQR Cashback
-                        </span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-tertiary/20 text-tertiary font-bold uppercase">
-                          Instant
-                        </span>
-                      </div>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Direct credit to your Bakong wallet upon invoice confirmation.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Benefit 2 */}
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors border border-white/5">
-                    <div className="w-10 h-10 rounded-lg bg-secondary-container/20 flex items-center justify-center shrink-0 text-secondary shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">local_shipping</span>
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-headline-sm text-headline-sm text-on-surface">
-                        Free Delivery: First 3 Orders
-                      </span>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Valid across all 25 provinces via express local courier networks.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Benefit 3 */}
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors border border-white/5">
-                    <div className="w-10 h-10 rounded-lg bg-primary-container/20 flex items-center justify-center shrink-0 text-primary shadow-sm">
-                      <span className="material-symbols-outlined text-[22px]">support_agent</span>
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-headline-sm text-headline-sm text-on-surface">
-                        Priority 24/7 Telegram Support
-                      </span>
-                      <p className="font-body-sm text-body-sm text-on-surface-variant">
-                        Live bilingual agents (Khmer &amp; English) for order tracking &amp; help.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* NBC Compliance Badge */}
-                <div className="pt-2 flex items-center justify-between bg-surface-container-lowest/60 rounded-xl p-3 border border-white/5">
-                  <div className="flex items-center gap-2 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px] text-tertiary">
-                      health_and_safety
-                    </span>
-                    <span className="font-label-sm text-label-sm">NBC Compliance Node #4108</span>
-                  </div>
-                  <span className="font-label-sm text-label-sm text-secondary font-semibold">
-                    99.98% Gateway Uptime
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Registration Form Card (7 Cols Desktop) */}
-            <div className="lg:col-span-7">
+          <div className="flex justify-center items-start min-h-[calc(100vh-11rem)]">
+            {/* Registration Form Card */}
+            <div className="w-full max-w-2xl mx-auto">
               <RegisterForm />
             </div>
           </div>
@@ -202,25 +88,14 @@ export const RegisterPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-container-low border border-white/5">
-                <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
-                <span className="font-label-md text-label-md text-on-surface font-semibold">
-                  Bakong KHQR
-                </span>
-                <span className="font-body-sm text-body-sm text-on-surface-variant">Direct Pay</span>
-              </div>
+
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-container-low border border-white/5">
                 <span className="material-symbols-outlined text-secondary text-[18px]">lock</span>
                 <span className="font-label-md text-label-md text-on-surface">
                   256-bit SSL Encrypted
                 </span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-container-low border border-white/5">
-                <span className="material-symbols-outlined text-tertiary text-[18px]">verified</span>
-                <span className="font-label-md text-label-md text-on-surface">
-                  NBC Certified Gateway
-                </span>
-              </div>
+
             </div>
             <div className="flex items-center gap-4 text-on-surface-variant font-label-md text-label-md">
               <Link to="/security" className="hover:text-on-surface transition-colors">
@@ -240,7 +115,7 @@ export const RegisterPage: React.FC = () => {
             <p>© 2026 Cambodian E-Store Network Ltd. All rights reserved.</p>
             <p className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[16px] text-tertiary">shield</span>
-              National Bank of Cambodia Compliant Merchant Gateway
+              
             </p>
           </div>
         </div>

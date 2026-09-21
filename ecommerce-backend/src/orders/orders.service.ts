@@ -208,7 +208,10 @@ export class OrdersService {
 
   async getUserOrders(userId: string) {
     return this.prisma.order.findMany({
-      where: { userId },
+      where: { 
+        userId, 
+        status: 'CONFIRMED' 
+      },
       include: {
         items: {
           include: {

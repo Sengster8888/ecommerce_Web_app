@@ -34,6 +34,11 @@ export const getMeApi = async (): Promise<User> => {
   return response.data;
 };
 
+export const getMeStatsApi = async (): Promise<{ ordersPlaced: number; totalSpent: number; pendingReviews: number; savedLocationsCount: number }> => {
+  const response = await apiClient.get<{ ordersPlaced: number; totalSpent: number; pendingReviews: number; savedLocationsCount: number }>(ENDPOINTS.AUTH.ME_STATS);
+  return response.data;
+};
+
 export const updateProfileApi = async (data: { fullName?: string; phone?: string; avatarUrl?: string }): Promise<User> => {
   const payload = {
     name: data.fullName,

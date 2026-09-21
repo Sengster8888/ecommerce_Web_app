@@ -402,7 +402,7 @@ export const CheckoutPage: React.FC = () => {
                 <div className="mt-space-lg pt-space-md flex items-center justify-between flex-wrap gap-space-sm text-on-surface-variant font-body-sm text-body-sm border-t border-white/5">
                   <div className="flex items-center gap-space-xs">
                     <span className="material-symbols-outlined text-tertiary text-[18px]">verified_user</span>
-                    <span>Audited under National Bank of Cambodia (NBC) Payment Regulations</span>
+                    <span>Audited under Secure Payment Regulations</span>
                   </div>
                   <span className="font-mono text-outline font-label-sm text-label-sm">TRANS-REF-ID: CS-KH-88294</span>
                 </div>

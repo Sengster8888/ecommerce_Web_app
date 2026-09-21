@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { StorefrontHeader } from '../components/storefront/StorefrontHeader';
 import { StorefrontFooter } from '../components/storefront/StorefrontFooter';
 import { useAuth } from '../features/auth/hooks/useAuth';
-import { updateProfileApi, changePasswordApi } from '../features/auth/api/auth.api';
+import { updateProfileApi, changePasswordApi, getMeStatsApi } from '../features/auth/api/auth.api';
 import {
   fetchAddressesApi,
   createAddressApi,
@@ -17,7 +17,7 @@ import { submitProductRatingApi } from '../features/reviews/api/reviews.api';
 import { parsePrice } from '../utils/price.utils';
 
 export const ProfilePage: React.FC = () => {
-  const { user, refreshProfile } = useAuth();
+  const { user, refreshProfile, logout } = useAuth();
 
   // Active Tab state
   const [activeTab, setActiveTab] = useState<'addresses' | 'orders' | 'reviews'>('addresses');
@@ -25,6 +25,12 @@ export const ProfilePage: React.FC = () => {
   // Real Data states
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [orders, setOrders] = useState<OrderDetail[]>([]);
+  const [profileStats, setProfileStats] = useState({
+    ordersPlaced: 0,
+    totalSpent: 0,
+    pendingReviews: 0,
+    savedLocationsCount: 0,
+  });
   const [loading, setLoading] = useState<boolean>(true);
 
   // Filter states for Order History
@@ -115,12 +121,14 @@ export const ProfilePage: React.FC = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [addrRes, orderRes] = await Promise.all([
+      const [addrRes, orderRes, statsRes] = await Promise.all([
         fetchAddressesApi(),
         fetchMyOrdersApi(),
+        getMeStatsApi(),
       ]);
       setAddresses(addrRes);
-      setOrders(orderRes);
+      setOrders(orderRes.filter(o => o.status === 'CONFIRMED'));
+      setProfileStats(statsRes);
     } catch (err) {
       console.error('Error loading profile data:', err);
     } finally {
@@ -315,7 +323,7 @@ export const ProfilePage: React.FC = () => {
   };
 
   // Compute stats directly from backend API orders
-  const totalOrdersCount = orders.length;
+  const totalOrdersCount = profileStats.ordersPlaced;
   const activeOrdersCount = orders.filter((o) =>
     ['SHIPPED', 'PROCESSING', 'CONFIRMED', 'PENDING'].includes(o.status)
   ).length;
@@ -323,8 +331,8 @@ export const ProfilePage: React.FC = () => {
   const cancelledOrdersCount = orders.filter((o) => o.status === 'CANCELLED').length;
 
   const completedOrders = orders.filter((o) => o.status === 'DELIVERED');
-  const totalSpentUsd = completedOrders.reduce((sum, o) => sum + parsePrice(o.totalAmount || 0), 0);
-  const savedLocationsCount = addresses.length;
+  const totalSpentUsd = profileStats.totalSpent;
+  const savedLocationsCount = profileStats.savedLocationsCount;
 
   // Filtered orders list dynamically matching status & query from real backend data
   const filteredOrders = orders.filter((order) => {
@@ -433,6 +441,14 @@ export const ProfilePage: React.FC = () => {
                         <span className="material-symbols-outlined text-[15px]">visibility</span>
                         View Avatar
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => logout()}
+                        className="px-3 py-1 rounded-lg bg-[#ff4a4a]/90 hover:bg-[#ff4a4a] text-white font-sans text-xs font-semibold flex items-center gap-1.5 shadow-[0_0_14px_rgba(255,74,74,0.3)] transition-all cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-[15px]">logout</span>
+                        Logout
+                      </button>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[#c7c4d7] font-sans text-xs sm:text-sm">
@@ -462,10 +478,6 @@ export const ProfilePage: React.FC = () => {
                     <span className="font-outfit font-bold text-xl text-[#4cd7f6] mt-1">
                       {totalOrdersCount}
                     </span>
-                    <span className="text-xs font-semibold text-[#4edea3] flex items-center gap-0.5 mt-0.5">
-                      <span className="material-symbols-outlined text-[13px]">trending_up</span>{' '}
-                      {activeOrdersCount} Active
-                    </span>
                   </div>
 
                   <div className="flex flex-col p-3 sm:p-4 rounded-xl bg-[#0a0e18]/80 border border-[#262a35] backdrop-blur-md shadow-md">
@@ -481,10 +493,7 @@ export const ProfilePage: React.FC = () => {
                     <span className="text-[11px] font-medium text-[#908fa0] uppercase tracking-wider">
                       Pending Reviews
                     </span>
-                    <span className="font-outfit font-bold text-xl text-[#c0c1ff] mt-1">3</span>
-                    <span className="text-xs font-semibold text-[#4cd7f6] mt-0.5">
-                      +150 pts each
-                    </span>
+                    <span className="font-outfit font-bold text-xl text-[#c0c1ff] mt-1">{profileStats.pendingReviews}</span>
                   </div>
 
                   <div className="flex flex-col p-3 sm:p-4 rounded-xl bg-[#0a0e18]/80 border border-[#262a35] backdrop-blur-md shadow-md">
@@ -494,7 +503,6 @@ export const ProfilePage: React.FC = () => {
                     <span className="font-outfit font-bold text-xl text-white mt-1">
                       {savedLocationsCount}
                     </span>
-                    <span className="text-xs text-[#908fa0] mt-0.5">Phnom Penh</span>
                   </div>
                 </div>
               </div>
@@ -550,17 +558,7 @@ export const ProfilePage: React.FC = () => {
                 >
                   <span className="material-symbols-outlined text-[18px]">reviews</span>
                   My Reviews
-                  <span className="px-2 py-0.5 rounded-full bg-[#313540] text-[#4cd7f6] text-xs font-bold">
-                    3 Pending
-                  </span>
                 </button>
-              </div>
-
-              <div className="hidden md:flex items-center gap-2 px-3 text-[#908fa0] font-sans text-xs">
-                <span className="material-symbols-outlined text-[16px] text-[#4edea3]">
-                  lock_open
-                </span>
-                End-to-End Bakong KHQR Security
               </div>
             </div>
 
@@ -763,12 +761,6 @@ export const ProfilePage: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-1.5 text-[#908fa0] text-xs pt-1">
-                            <span className="material-symbols-outlined text-[16px] text-[#4edea3]">
-                              electric_moped
-                            </span>
-                            Eligible for 60-minute Phnom Penh Express Delivery
-                          </div>
                         </div>
                       ))
                     ) : (
@@ -802,12 +794,6 @@ export const ProfilePage: React.FC = () => {
                               </span>
                               Recipient: {displayPhone}
                             </div>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[#908fa0] text-xs pt-1">
-                            <span className="material-symbols-outlined text-[16px] text-[#4edea3]">
-                              electric_moped
-                            </span>
-                            Eligible for 60-minute Toul Kork Express Delivery
                           </div>
                         </div>
 
@@ -852,9 +838,6 @@ export const ProfilePage: React.FC = () => {
                       </span>
                       <span className="font-sans font-semibold text-sm text-white">
                         Add Another Delivery Address
-                      </span>
-                      <span className="text-xs text-[#908fa0]">
-                        Provincial hubs (Siem Reap, Battambang, Sihanoukville) supported
                       </span>
                     </button>
                   </div>
@@ -1048,9 +1031,6 @@ export const ProfilePage: React.FC = () => {
                           <span className="font-outfit font-bold text-xl text-[#4cd7f6]">
                             ${parsePrice(ord.totalAmount).toFixed(2)}
                           </span>
-                          <span className="text-xs text-[#908fa0]">
-                            (via KHQR)
-                          </span>
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2">
@@ -1095,7 +1075,9 @@ export const ProfilePage: React.FC = () => {
             {/* TAB 3: MY REVIEWS SECTION                                 */}
             {/* ========================================================= */}
             {activeTab === 'reviews' && (() => {
-              const realOrderItems = orders.flatMap((o) =>
+              const realOrderItems = orders
+                .filter(o => o.status === 'CONFIRMED' || o.status === 'DELIVERED')
+                .flatMap((o) =>
                 (o.items || []).map((item) => ({
                   productId: item.productId,
                   productName: item.productNameSnapshot,

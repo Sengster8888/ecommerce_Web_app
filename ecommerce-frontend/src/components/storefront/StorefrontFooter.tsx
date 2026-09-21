@@ -81,21 +81,9 @@ export const StorefrontFooter: React.FC = () => {
             <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">
               Instant QR checkout and multi-tier bank level encrypted payment gateways.
             </p>
-            <div className="grid grid-cols-3 gap-space-xs">
+            <div className="grid grid-cols-2 gap-space-xs">
               <div className="flex items-center justify-center p-space-xs rounded-lg bg-surface-container text-center font-label-sm text-label-sm text-tertiary border border-tertiary/30 shadow-[0_0_12px_rgba(78,222,163,0.15)] font-bold">
                 Bakong KHQR
-              </div>
-              <div className="flex items-center justify-center p-space-xs rounded-lg bg-surface-container text-center font-label-sm text-label-sm text-secondary font-bold">
-                Wing
-              </div>
-              <div className="flex items-center justify-center p-space-xs rounded-lg bg-surface-container text-center font-label-sm text-label-sm text-primary font-bold">
-                ABA PAY
-              </div>
-              <div className="flex items-center justify-center p-space-xs rounded-lg bg-surface-container text-center font-label-sm text-label-sm text-on-surface">
-                Visa
-              </div>
-              <div className="flex items-center justify-center p-space-xs rounded-lg bg-surface-container text-center font-label-sm text-label-sm text-on-surface">
-                Mastercard
               </div>
               <div className="flex items-center justify-center p-space-xs rounded-lg bg-surface-container text-center font-label-sm text-label-sm text-on-surface-variant">
                 COD
@@ -109,13 +97,13 @@ export const StorefrontFooter: React.FC = () => {
           <p>© 2026 Cambodian E-Store. Engineered for digital retail excellence.</p>
           <div className="flex gap-space-lg">
             <span className="text-on-surface-variant hover:text-on-surface cursor-pointer">
-              Privacy Notice
+              Privacy Policy
             </span>
             <span className="text-on-surface-variant hover:text-on-surface cursor-pointer">
-              KHQR Terms of Service
+              Terms of Service
             </span>
             <span className="text-on-surface-variant hover:text-on-surface cursor-pointer">
-              Provincial Shipping Policy
+              Shipping Policy
             </span>
           </div>
         </div>

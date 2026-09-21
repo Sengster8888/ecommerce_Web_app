@@ -34,6 +34,54 @@ export class AuthService {
     return result;
   }
 
+  // Fetch profile statistics (Orders Placed, Total Spent, Pending Reviews, Saved Locations)
+  async getProfileStats(userId: string) {
+    // 1. Orders Placed & Total Spent (CONFIRMED or DELIVERED)
+    const orders = await this.prisma.order.findMany({
+      where: {
+        userId,
+        status: { in: ['CONFIRMED', 'DELIVERED'] },
+      },
+      include: {
+        items: true,
+      }
+    });
+
+    const ordersPlaced = orders.length;
+    const totalSpent = orders.reduce((sum, order) => sum + Number(order.totalAmount), 0);
+
+    // 2. Pending Reviews
+    const productIdsInOrders = new Set(
+      orders.flatMap(o => o.items.map(item => Number(item.productId)))
+    );
+
+    const submittedReviews = await this.prisma.review.findMany({
+      where: { userId },
+      select: { productId: true },
+    });
+    
+    const submittedProductIds = new Set(submittedReviews.map(r => Number(r.productId)));
+
+    let pendingReviews = 0;
+    productIdsInOrders.forEach(productId => {
+      if (!submittedProductIds.has(productId)) {
+        pendingReviews++;
+      }
+    });
+
+    // 3. Saved Locations
+    const savedLocationsCount = await this.prisma.address.count({
+      where: { userId },
+    });
+
+    return {
+      ordersPlaced,
+      totalSpent,
+      pendingReviews,
+      savedLocationsCount,
+    };
+  }
+
   // Update customer profile (name, phone, avatarUrl)
   async updateProfile(userId: string, dto: UpdateProfileDto) {
     const userExists = await this.prisma.user.findUnique({

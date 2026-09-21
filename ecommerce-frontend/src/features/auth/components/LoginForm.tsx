@@ -46,9 +46,6 @@ export const LoginForm: React.FC = () => {
         <h2 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
           Welcome Back
         </h2>
-        <p className="font-body-md text-body-md text-on-surface-variant max-w-xs leading-relaxed">
-          Sign in to access your orders, saved wishlist, and Bakong KHQR wallet
-        </p>
       </div>
 
       {/* Error Alert */}
@@ -142,7 +139,7 @@ export const LoginForm: React.FC = () => {
               className="w-4 h-4 rounded bg-surface-container text-primary-container focus:ring-0 focus:outline-none cursor-pointer accent-primary"
             />
             <span className="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">
-              Remember me for 30 days
+              Remember me for 7 days
             </span>
           </label>
           <Link

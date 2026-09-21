@@ -46,10 +46,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {isInStock ? (product.stock <= 3 ? `Only ${product.stock} Left` : 'In Stock') : 'Out of Stock'}
         </span>
 
-        {/* Express Delivery Badge */}
-        <span className="absolute top-2 right-2 px-space-xs py-space-2xs rounded bg-surface-container-lowest/90 backdrop-blur text-secondary font-label-sm text-label-sm border border-secondary/20">
-          PP Express
-        </span>
 
         {/* Quick Details Trigger Button */}
         <button

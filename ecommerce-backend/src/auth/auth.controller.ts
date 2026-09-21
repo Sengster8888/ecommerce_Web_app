@@ -103,6 +103,15 @@ export class AuthController {
     return this.authService.getProfile(user?.id);
   }
 
+  @ApiOperation({ summary: 'Get current logged-in user profile statistics' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('me/stats')
+  async getMeStats(@Req() request: Request) {
+    const user = request.user as any;
+    return this.authService.getProfileStats(user?.id);
+  }
+
   @ApiOperation({ summary: 'Update profile details (name, phone, avatarUrl)' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

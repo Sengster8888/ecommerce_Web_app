@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AppRoutes } from './routes/AppRoutes';
 import './index.css';
+import 'material-symbols/outlined.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

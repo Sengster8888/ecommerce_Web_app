@@ -9,6 +9,7 @@ import { ProductCard } from '../components/storefront/ProductCard';
 import { ProductQuickViewModal } from '../components/storefront/ProductQuickViewModal';
 import { StorefrontFooter } from '../components/storefront/StorefrontFooter';
 import { ToastNotification } from '../components/storefront/ToastNotification';
+import { MobileProductDetailPage } from './mobile/MobileProductDetailPage';
 
 import { useAuth } from '../features/auth/hooks/useAuth';
 import {
@@ -117,8 +118,8 @@ export const ProductDetailPage: React.FC = () => {
   useEffect(() => {
     if (product) {
       const primary =
-        product.images?.find((img) => img.isPrimary)?.imageUrl ||
-        product.images?.[0]?.imageUrl;
+        product.images?.find((img: any) => img.isPrimary)?.imageUrl ||
+        product.images?.[0]?.imageUrl || '';
       setSelectedImage(primary);
       setQuantity(1);
     }
@@ -191,7 +192,12 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#0f131d] font-sans text-on-surface antialiased min-h-screen flex flex-col">
+    <>
+      <div className="md:hidden">
+        <MobileProductDetailPage product={product} onAddToCart={handleAddToCart} />
+      </div>
+      <div className="hidden md:block">
+        <div className="bg-[#0f131d] font-sans text-on-surface antialiased min-h-screen flex flex-col">
       {/* Top Header Navigation */}
       <StorefrontHeader cartCount={cartItemsCount} cartTotal={cartTotal} />
 
@@ -553,6 +559,8 @@ export const ProductDetailPage: React.FC = () => {
 
       <ToastNotification message={toastMessage} isVisible={isToastVisible} />
     </div>
+  </div>
+</>
   );
 };
 

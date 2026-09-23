@@ -8,8 +8,35 @@ import ShopPage from '../pages/ShopPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
 import CartPage from '../pages/CartPage';
 import CheckoutPage from '../pages/CheckoutPage';
+import MobileCheckoutPage from '../pages/mobile/MobileCheckoutPage';
+import { useIsMobile } from '../hooks/useIsMobile';
+
+const CheckoutRouteWrapper = () => {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileCheckoutPage /> : <CheckoutPage />;
+};
 import OrdersPage from '../pages/OrdersPage';
+import MobileOrdersPage from '../pages/mobile/MobileOrdersPage';
+
+const OrdersRouteWrapper = () => {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileOrdersPage /> : <OrdersPage />;
+};
 import OrderDetailPage from '../pages/OrderDetailPage';
+import MobileOrderDetailPage from '../pages/mobile/MobileOrderDetailPage';
+
+const OrderDetailRouteWrapper = () => {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileOrderDetailPage /> : <OrderDetailPage />;
+};
+
+
+import MobileCatalogPage from '../pages/mobile/MobileCatalogPage';
+
+const ProductsRouteWrapper = () => {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileCatalogPage /> : <ProductsPage />;
+};
 import ProfilePage from '../pages/ProfilePage';
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
@@ -24,7 +51,7 @@ export const AppRoutes: React.FC = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/products" element={<ProductsPage />} />
+      <Route path="/products" element={<ProductsRouteWrapper />} />
       <Route path="/shop" element={<ShopPage />} />
 
       <Route path="/products/:id" element={<ProductDetailPage />} />
@@ -45,7 +72,7 @@ export const AppRoutes: React.FC = () => {
         path="/checkout"
         element={
           <ProtectedRoute>
-            <CheckoutPage />
+            <CheckoutRouteWrapper />
           </ProtectedRoute>
         }
       />
@@ -53,7 +80,7 @@ export const AppRoutes: React.FC = () => {
         path="/orders"
         element={
           <ProtectedRoute>
-            <OrdersPage />
+            <OrdersRouteWrapper />
           </ProtectedRoute>
         }
       />
@@ -61,7 +88,7 @@ export const AppRoutes: React.FC = () => {
         path="/orders/:id"
         element={
           <ProtectedRoute>
-            <OrderDetailPage />
+            <OrderDetailRouteWrapper />
           </ProtectedRoute>
         }
       />

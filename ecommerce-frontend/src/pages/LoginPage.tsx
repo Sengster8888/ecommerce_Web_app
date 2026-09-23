@@ -1,21 +1,52 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import login3DImage from '../assets/Untitled design.svg';
 import { LoginForm } from '../features/auth/components/LoginForm';
 
 export const LoginPage: React.FC = () => {
   const [lang, setLang] = useState<'EN' | 'KH'>('EN');
+  const navigate = useNavigate();
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
       {/* Background Ambient Glow Orbs */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/4 w-[500px] h-[500px] rounded-full bg-primary-container/10 blur-[120px]"></div>
-        <div className="absolute top-1/3 -right-32 w-[450px] h-[450px] rounded-full bg-secondary-container/10 blur-[140px]"></div>
+        {/* Desktop Orbs */}
+        <div className="hidden md:block absolute -top-40 left-1/4 w-[500px] h-[500px] rounded-full bg-primary-container/10 blur-[120px]"></div>
+        <div className="hidden md:block absolute top-1/3 -right-32 w-[450px] h-[450px] rounded-full bg-secondary-container/10 blur-[140px]"></div>
+        
+        {/* Mobile Orbs */}
+        <div className="md:hidden absolute -top-12 left-1/2 -translate-x-1/2 w-64 h-32 bg-primary-container/20 rounded-full blur-3xl"></div>
+        <div className="md:hidden absolute top-28 right-0 w-44 h-44 bg-secondary/15 rounded-full blur-2xl"></div>
+        <div className="md:hidden absolute bottom-10 left-[-20px] w-48 h-48 bg-tertiary-container/15 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Header */}
-      <header className="fixed top-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl border-b border-white/10 shadow-[0_1px_8px_rgba(0,0,0,0.3)]">
+      {/* Mobile Header */}
+      <header className="md:hidden fixed top-0 w-full z-50 pt-safe bg-[#0f131d]/85 backdrop-blur-md border-b border-white/10 shadow-[0_1px_8px_rgba(0,0,0,0.2)]">
+        <div className="h-16 px-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button aria-label="Go back" className="w-11 h-11 flex items-center justify-center rounded-xl bg-surface-container/60 hover:bg-surface-container text-on-surface transition-colors shrink-0 cursor-pointer" onClick={() => navigate(-1)} type="button">
+              <span className="material-symbols-outlined text-[20px]">arrow_back_ios_new</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary-container to-secondary flex items-center justify-center shadow-sm shrink-0">
+                <span className="material-symbols-outlined text-white text-[18px]">shopping_bag</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-tight whitespace-nowrap">&nbsp;E-Store</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center">
+            <button aria-label="User profile" className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center border border-white/10 shadow-sm shrink-0 text-primary hover:bg-surface-container-high transition-colors cursor-pointer">
+              <span className="material-symbols-outlined text-[20px]">person</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Desktop Header */}
+      <header className="hidden md:block fixed top-0 w-full z-50 bg-surface-container-lowest/80 backdrop-blur-xl border-b border-white/10 shadow-[0_1px_8px_rgba(0,0,0,0.3)]">
         <div className="h-16 max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2 group">
@@ -71,7 +102,7 @@ export const LoginPage: React.FC = () => {
       </header>
 
       {/* Main Viewport Content */}
-      <main className="w-full pt-20 pb-12 flex-1 relative z-10 bg-transparent flex flex-col justify-center">
+      <main className="w-full pt-16 md:pt-20 pb-safe pb-12 flex-1 relative z-10 bg-transparent flex flex-col justify-center">
         <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 lg:py-8">
           <div className="flex justify-center items-center min-h-[calc(100vh-11rem)]">
             {/* Interactive Form */}
@@ -83,7 +114,7 @@ export const LoginPage: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="w-full relative z-10 bg-surface-container-lowest/90 backdrop-blur-2xl border-t border-white/10 shadow-[0_-1px_16px_rgba(0,0,0,0.4)] mt-auto py-6">
+      <footer className="hidden md:block w-full relative z-10 bg-surface-container-lowest/90 backdrop-blur-2xl border-t border-white/10 shadow-[0_-1px_16px_rgba(0,0,0,0.4)] mt-auto py-6">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3">

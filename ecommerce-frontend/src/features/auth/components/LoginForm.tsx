@@ -35,13 +35,14 @@ export const LoginForm: React.FC = () => {
 
       {/* Header & Logo Section */}
       <div className="flex flex-col gap-2 text-center items-center">
-        <div className="relative mb-1">
-          <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center p-2 shadow-md border border-white/10">
-            <span className="material-symbols-outlined text-primary text-[32px]">storefront</span>
+        <div className="relative mb-2">
+          <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center shadow-inner relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-tr from-primary-container/30 to-secondary/30"></div>
+            <span className="material-symbols-outlined text-secondary text-[30px] relative z-10" style={{ fontVariationSettings: '"FILL" 1' }}>account_balance_wallet</span>
           </div>
-          <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-tertiary flex items-center justify-center text-[10px] text-on-tertiary font-bold shadow-sm">
-            ✓
-          </span>
+          <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-tertiary shadow-sm flex items-center justify-center">
+            <span className="w-1.5 h-1.5 rounded-full bg-surface-container-lowest"></span>
+          </div>
         </div>
         <h2 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
           Welcome Back
@@ -154,19 +155,22 @@ export const LoginForm: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full h-12 mt-1 rounded-xl bg-gradient-to-r from-primary-container via-primary to-secondary text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(128,131,255,0.35)] hover:shadow-[0_0_32px_rgba(76,215,246,0.5)] active:scale-[0.99] transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+          className="relative w-full h-12 mt-2 rounded-xl bg-gradient-to-r from-primary-container via-inverse-primary to-secondary text-on-primary font-label-lg text-label-lg tracking-wide flex items-center justify-center gap-2 shadow-[0_0_24px_rgba(99,102,241,0.45)] active:scale-[0.98] transition-transform overflow-hidden group disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {isLoading ? (
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
-              <span>Signing in...</span>
-            </div>
-          ) : (
-            <>
-              <span>Sign In to Account</span>
-              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-            </>
-          )}
+          <span className="relative z-10 flex items-center gap-2">
+            {isLoading ? (
+              <>
+                <span className="w-5 h-5 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+                <span>Authenticating...</span>
+              </>
+            ) : (
+              <>
+                <span>Sign In</span>
+                <span className="material-symbols-outlined text-[18px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+              </>
+            )}
+          </span>
+          <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </button>
       </form>
 
@@ -184,9 +188,9 @@ export const LoginForm: React.FC = () => {
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="h-11 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2 text-on-surface shadow-sm font-label-md text-label-md w-full border border-white/5 cursor-pointer"
+          className="w-full h-12 rounded-xl bg-surface-container hover:bg-surface-container-high transition-colors shadow-sm flex items-center justify-center gap-3 text-on-surface font-label-lg text-label-lg active:scale-[0.98] cursor-pointer"
         >
-          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24">
             <path
               d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.67v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.16z"
               fill="#4285F4"
@@ -204,21 +208,19 @@ export const LoginForm: React.FC = () => {
               fill="#EA4335"
             ></path>
           </svg>
-          <span>Google</span>
+          <span>Continue with Google</span>
         </button>
       </div>
 
       {/* Sign Up Redirection */}
-      <div className="text-center pt-1">
-        <p className="font-body-md text-body-md text-on-surface-variant">
-          Don't have an account?{' '}
-          <Link
-            to="/register"
-            className="text-primary font-semibold hover:text-primary-fixed transition-colors underline ml-1"
-          >
-            Sign Up for Free
-          </Link>
-        </p>
+      <div className="flex items-center justify-center gap-2 pt-2 pb-1 text-center">
+        <span className="font-body-md text-body-md text-on-surface-variant">Don't have an account?</span>
+        <Link
+          to="/register"
+          className="font-label-lg text-label-lg text-primary hover:text-primary-fixed transition-colors underline-offset-4 hover:underline"
+        >
+          Sign Up
+        </Link>
       </div>
     </div>
   );

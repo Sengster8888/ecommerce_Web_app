@@ -13,8 +13,29 @@ export class ProductsService {
     const ratingSum = reviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0);
     const rating = reviewCount > 0 ? parseFloat((ratingSum / reviewCount).toFixed(1)) : 0;
 
+    let discountPercentage = 0;
+    let discountEndDate = null;
+    const now = new Date();
+    
+    if (product.discountProducts && product.discountProducts.length > 0) {
+      const activeDiscount = product.discountProducts.find(
+        (dp: any) => dp.discount?.isActive && dp.discount?.startDate <= now && dp.discount?.endDate >= now
+      )?.discount;
+      
+      if (activeDiscount) {
+         if (activeDiscount.type === 'PERCENTAGE') {
+           discountPercentage = Number(activeDiscount.value);
+         } else if (activeDiscount.type === 'FIXED_AMOUNT') {
+           discountPercentage = Math.round((Number(activeDiscount.value) / Number(product.price)) * 100);
+         }
+         discountEndDate = activeDiscount.endDate.toISOString();
+      }
+    }
+
     return {
       ...product,
+      discountPercentage,
+      discountEndDate,
       id: product.id?.toString(),
       categoryId: product.categoryId?.toString(),
       price: Number(product.price),
@@ -64,7 +85,7 @@ export class ProductsService {
           },
         } : undefined,
       },
-      include: { images: true, category: true, reviews: { select: { rating: true } } },
+      include: { images: true, category: true, reviews: { select: { rating: true } }, discountProducts: { include: { discount: true } } },
     });
 
     return this.formatProduct(created);
@@ -95,6 +116,7 @@ export class ProductsService {
           images: { orderBy: { sortOrder: 'asc' } },
           category: true,
           reviews: { select: { rating: true } },
+          discountProducts: { include: { discount: true } },
         },
         orderBy: { createdAt: 'desc' },
       }),
@@ -116,6 +138,7 @@ export class ProductsService {
         images: { orderBy: { sortOrder: 'asc' } },
         category: true,
         reviews: { select: { rating: true } },
+        discountProducts: { include: { discount: true } },
       },
       orderBy: {
         reviews: {
@@ -146,6 +169,7 @@ export class ProductsService {
         images: { orderBy: { sortOrder: 'asc' } },
         category: true,
         reviews: { select: { rating: true } },
+        discountProducts: { include: { discount: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -155,7 +179,7 @@ export class ProductsService {
   async findOne(id: bigint) {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { images: true, category: true, reviews: { select: { rating: true } } },
+      include: { images: true, category: true, reviews: { select: { rating: true } }, discountProducts: { include: { discount: true } } },
     });
     if (!product) {
       throw new NotFoundException('Product not found.');
@@ -170,6 +194,7 @@ export class ProductsService {
         images: { orderBy: { sortOrder: 'asc' } },
         category: true,
         reviews: { select: { rating: true } },
+        discountProducts: { include: { discount: true } },
       },
     });
     if (!product) {
@@ -204,7 +229,7 @@ export class ProductsService {
         status: dto.status,
         categoryId: catId,
       },
-      include: { images: true, category: true, reviews: { select: { rating: true } } },
+      include: { images: true, category: true, reviews: { select: { rating: true } }, discountProducts: { include: { discount: true } } },
     });
 
     return this.formatProduct(updated);

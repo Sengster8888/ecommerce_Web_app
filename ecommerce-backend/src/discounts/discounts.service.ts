@@ -87,6 +87,10 @@ export class DiscountsService {
 
       const calculated = this.calculateDiscountAmount(discount, decimalSubtotal, cartItems);
 
+      if (calculated.discountAmount === 0) {
+        throw new BadRequestException('This promo code is not applicable to any items in your cart.');
+      }
+
       return {
         discountId: discount.id.toString(),
         name: discount.name,
@@ -172,7 +176,7 @@ export class DiscountsService {
     let eligibleSubtotal = subtotal;
 
     // Filter subtotal if restricted to SPECIFIC_PRODUCTS or CATEGORY
-    if (discount.scope === 'SPECIFIC_PRODUCTS' && discount.discountProducts?.length > 0) {
+    if ((discount.scope === 'SPECIFIC_PRODUCTS' || discount.scope === 'PROMO_CODE') && discount.discountProducts?.length > 0) {
       const eligibleProductIds = new Set(
         discount.discountProducts.map((p: any) => p.productId.toString()),
       );
@@ -183,7 +187,7 @@ export class DiscountsService {
         }
       }
       eligibleSubtotal = new Decimal(applicableSum);
-    } else if (discount.scope === 'CATEGORY' && discount.discountCategories?.length > 0) {
+    } else if ((discount.scope === 'CATEGORY' || discount.scope === 'PROMO_CODE') && discount.discountCategories?.length > 0) {
       const eligibleCategoryIds = new Set(
         discount.discountCategories.map((c: any) => c.categoryId.toString()),
       );
@@ -198,6 +202,10 @@ export class DiscountsService {
 
     let discountAmount = new Decimal(0);
 
+    if (eligibleSubtotal.lte(0)) {
+      return { discountAmount: 0 };
+    }
+
     if (discount.type === 'PERCENTAGE') {
       const fractionalPercent = new Decimal(discount.value).div(100);
       discountAmount = eligibleSubtotal.mul(fractionalPercent);
@@ -208,6 +216,11 @@ export class DiscountsService {
     // Apply maxDiscountAmount cap if configured
     if (discount.maxDiscountAmount && discountAmount.gt(discount.maxDiscountAmount)) {
       discountAmount = new Decimal(discount.maxDiscountAmount);
+    }
+
+    // Ensure discount does not exceed the eligible subtotal (e.g. fixed amount on a cheap item)
+    if (discountAmount.gt(eligibleSubtotal)) {
+      discountAmount = eligibleSubtotal;
     }
 
     // Ensure discount does not exceed the total subtotal

@@ -30,6 +30,8 @@ export interface Product {
   updatedAt?: string;
 
   // Visual/Storefront enriched fields (fallback values supplied if not in DB)
+  discountPercentage?: number;
+  discountEndDate?: string;
   rating?: number;
   reviewCount?: number;
   expressDelivery?: boolean;

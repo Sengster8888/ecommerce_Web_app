@@ -2,8 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { StorefrontHeader } from '../components/storefront/StorefrontHeader';
 import { StorefrontFooter } from '../components/storefront/StorefrontFooter';
-import { useCart, exchangeRate } from '../features/cart/hooks/useCart';
+import { useCart } from '../features/cart/hooks/useCart';
 import { parsePrice } from '../utils/price.utils';
+import { MobileCartPage } from './mobile/MobileCartPage';
 
 export const CartPage: React.FC = () => {
   const {
@@ -26,7 +27,28 @@ export const CartPage: React.FC = () => {
   } = useCart();
 
   return (
-    <div className="min-h-screen bg-surface font-body-md text-on-surface flex flex-col justify-between">
+    <>
+      <div className="md:hidden">
+        <MobileCartPage
+          cartItems={cartItems}
+          loading={loading}
+          updatingItemId={updatingItemId}
+          subtotal={subtotal}
+          totalCount={totalCount}
+          discountAmount={discountAmount}
+          grandTotalUsd={grandTotalUsd}
+          promoCode={promoCode}
+          setPromoCode={setPromoCode}
+          appliedPromo={appliedPromo}
+          promoError={promoError}
+          handleUpdateQuantity={handleUpdateQuantity}
+          handleRemoveItem={handleRemoveItem}
+          handleClearCart={handleClearCart}
+          handleApplyPromo={handleApplyPromo}
+          handleRemovePromo={handleRemovePromo}
+        />
+      </div>
+      <div className="hidden md:flex min-h-screen bg-surface font-body-md text-on-surface flex-col justify-between">
       <StorefrontHeader cartCount={totalCount} cartTotal={subtotal} />
 
       <main className="w-full pt-24 pb-space-3xl bg-surface min-h-screen">
@@ -354,7 +376,8 @@ export const CartPage: React.FC = () => {
       </main>
 
       <StorefrontFooter />
-    </div>
+      </div>
+    </>
   );
 };
 

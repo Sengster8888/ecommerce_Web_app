@@ -8,18 +8,19 @@ import {
   type TrackingTimelineEvent,
 } from '../../features/orders/api/orders.api';
 import { parsePrice } from '../../utils/price.utils';
-import { useAuth } from '../../features/auth/hooks/useAuth';
+
+import { fetchCart } from '../../features/cart/api/cart.api';
 
 export const MobileOrdersPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const queryOrderId = searchParams.get('id');
-  const { user } = useAuth();
 
   const [orders, setOrders] = useState<OrderDetail[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
   const [trackingTimeline, setTrackingTimeline] = useState<TrackingTimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cartCount, setCartCount] = useState<number>(0);
 
   // Chat sheet state
   const [isChatSheetOpen, setIsChatSheetOpen] = useState(false);
@@ -46,9 +47,16 @@ export const MobileOrdersPage: React.FC = () => {
   const loadOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const orderList = await fetchMyOrdersApi();
+      const [orderList, cartRes] = await Promise.all([
+        fetchMyOrdersApi(),
+        fetchCart().catch(() => null),
+      ]);
       const confirmedOrders = orderList.filter((o) => o.status === 'CONFIRMED' || o.status === 'PROCESSING' || o.status === 'SHIPPED' || o.status === 'DELIVERED');
       setOrders(confirmedOrders);
+
+      if (cartRes && cartRes.items) {
+        setCartCount(cartRes.items.reduce((acc: number, item: any) => acc + item.quantity, 0));
+      }
 
       if (confirmedOrders.length > 0) {
         let targetOrder = confirmedOrders[0];
@@ -517,6 +525,11 @@ export const MobileOrdersPage: React.FC = () => {
           <a className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/cart'); }}>
             <div className="relative flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
               <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-0.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-secondary-container text-on-secondary font-label-sm text-label-sm leading-none flex items-center justify-center font-bold shadow-[0_0_12px_rgba(3,181,211,0.5)]">
+                  {cartCount}
+                </span>
+              )}
             </div>
             <span className="font-label-sm text-label-sm font-medium tracking-tight">Cart</span>
           </a>

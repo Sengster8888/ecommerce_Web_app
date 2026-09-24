@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateAddressDto } from './dto/create-address.dto.js';
 import { UpdateAddressDto } from './dto/update-address.dto.js';
@@ -110,9 +110,16 @@ export class AddressesService {
     const address = await this.getAddressById(userId, addressId);
 
     return this.prisma.$transaction(async (tx) => {
-      await tx.address.delete({
-        where: { id: addressId },
-      });
+      try {
+        await tx.address.delete({
+          where: { id: addressId },
+        });
+      } catch (error: any) {
+        if (error.code === 'P2003') {
+          throw new BadRequestException('Cannot delete address because it is linked to past or active orders.');
+        }
+        throw error;
+      }
 
       // If deleted address was default, set the latest remaining address as default
       if (address.isDefault) {

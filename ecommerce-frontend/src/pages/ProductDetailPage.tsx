@@ -34,6 +34,7 @@ export const ProductDetailPage: React.FC = () => {
   const [cartItemsCount, setCartItemsCount] = useState<number>(0);
   const [cartTotal, setCartTotal] = useState<number>(0.0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [isToastVisible, setIsToastVisible] = useState<boolean>(false);
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
 
@@ -42,8 +43,9 @@ export const ProductDetailPage: React.FC = () => {
   const [selectedRating, setSelectedRating] = useState<number>(5);
   const [submittingRating, setSubmittingRating] = useState<boolean>(false);
 
-  const showToast = useCallback((msg: string) => {
+  const showToast = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
     setToastMessage(msg);
+    setToastType(type);
     setIsToastVisible(true);
     setTimeout(() => {
       setIsToastVisible(false);
@@ -71,7 +73,7 @@ export const ProductDetailPage: React.FC = () => {
     e.preventDefault();
     if (!product?.id) return;
     if (!isAuthenticated) {
-      showToast('Please sign in to rate products.');
+      showToast('Please sign in to rate products.', 'error');
       navigate('/login');
       return;
     }
@@ -81,12 +83,13 @@ export const ProductDetailPage: React.FC = () => {
       showToast('Thank you! Your verified rating has been submitted.');
       await loadRatingSummary(product.id);
     } catch (err: any) {
-      const errorMsg =
-        err.response?.data?.message ||
-        (Array.isArray(err.response?.data?.message)
-          ? err.response?.data?.message.join(', ')
-          : 'You can only rate products that you have purchased and have been successfully delivered.');
-      showToast(errorMsg);
+      let errorMsg = 'Failed to submit rating.';
+      if (err.response?.data?.message) {
+        errorMsg = Array.isArray(err.response.data.message)
+          ? err.response.data.message.join(', ')
+          : err.response.data.message;
+      }
+      showToast(errorMsg, 'error');
     } finally {
       setSubmittingRating(false);
     }
@@ -557,7 +560,7 @@ export const ProductDetailPage: React.FC = () => {
         }}
       />
 
-      <ToastNotification message={toastMessage} isVisible={isToastVisible} />
+      <ToastNotification message={toastMessage} isVisible={isToastVisible} type={toastType} />
     </div>
   </div>
 </>

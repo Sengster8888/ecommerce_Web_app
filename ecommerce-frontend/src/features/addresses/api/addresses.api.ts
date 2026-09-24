@@ -40,18 +40,18 @@ export const createAddressApi = async (data: CreateAddressData): Promise<Address
   return response.data;
 };
 
+export const updateAddressApi = async (id: string | number, data: Partial<CreateAddressData>): Promise<Address> => {
+  const response = await apiClient.patch(ENDPOINTS.ADDRESSES.DETAIL(String(id)), data);
+  return response.data;
+};
+
 export const setDefaultAddressApi = async (id: string | number): Promise<Address> => {
   const response = await apiClient.patch(ENDPOINTS.ADDRESSES.SET_DEFAULT(String(id)));
   return response.data;
 };
 
 export const deleteAddressApi = async (id: string | number): Promise<boolean> => {
-  try {
-    await apiClient.delete(ENDPOINTS.ADDRESSES.DELETE(String(id)));
-    return true;
-  } catch (error) {
-    console.error('Failed to delete address:', error);
-    return false;
-  }
+  const response = await apiClient.delete(ENDPOINTS.ADDRESSES.DELETE(String(id)));
+  return true;
 };
 

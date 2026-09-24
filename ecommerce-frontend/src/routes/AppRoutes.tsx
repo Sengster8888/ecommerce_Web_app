@@ -38,6 +38,12 @@ const ProductsRouteWrapper = () => {
   return isMobile ? <MobileCatalogPage /> : <ProductsPage />;
 };
 import ProfilePage from '../pages/ProfilePage';
+import MobileProfilePage from '../pages/mobile/MobileProfilePage';
+
+const ProfileRouteWrapper = () => {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileProfilePage /> : <ProfilePage />;
+};
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import NotFoundPage from '../pages/NotFoundPage';
@@ -96,7 +102,7 @@ export const AppRoutes: React.FC = () => {
         path="/profile"
         element={
           <ProtectedRoute>
-            <ProfilePage />
+            <ProfileRouteWrapper />
           </ProtectedRoute>
         }
       />

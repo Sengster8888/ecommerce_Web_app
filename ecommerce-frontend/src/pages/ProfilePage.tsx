@@ -7,6 +7,7 @@ import { updateProfileApi, changePasswordApi, getMeStatsApi } from '../features/
 import {
   fetchAddressesApi,
   createAddressApi,
+  updateAddressApi,
   setDefaultAddressApi,
   deleteAddressApi,
   type Address,
@@ -57,8 +58,10 @@ export const ProfilePage: React.FC = () => {
   const [postAvatarUrl, setPostAvatarUrl] = useState('');
   const [postAvatarLoading, setPostAvatarLoading] = useState(false);
 
-  // Add Address Modal state
+  // Add/Edit Address Modal state
   const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
+  const [isEditAddressOpen, setIsEditAddressOpen] = useState(false);
+  const [editAddressId, setEditAddressId] = useState<string | number | null>(null);
   const [addressForm, setAddressForm] = useState<CreateAddressData>({
     label: 'Home',
     recipientName: '',
@@ -97,23 +100,23 @@ export const ProfilePage: React.FC = () => {
       showToast(`Thank you! Your ${itemRating}-star rating for "${productName}" has been recorded.`);
       setSubmittedReviewIds((prev) => new Set(prev).add(productId));
     } catch (err: any) {
-      const msg =
-        err.response?.data?.message ||
-        (Array.isArray(err.response?.data?.message)
-          ? err.response?.data?.message.join(', ')
-          : `Thank you! Rating for "${productName}" recorded.`);
-      showToast(msg);
-      setSubmittedReviewIds((prev) => new Set(prev).add(productId));
+      let errorMsg = 'Failed to submit rating.';
+      if (err.response?.data?.message) {
+        errorMsg = Array.isArray(err.response.data.message)
+          ? err.response.data.message.join(', ')
+          : err.response.data.message;
+      }
+      showToast(errorMsg, 'error');
     } finally {
       setSubmittingReviewId(null);
     }
   };
 
   // Notification Toast state
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message: msg, type });
     setTimeout(() => setToast(null), 4000);
   };
 
@@ -162,7 +165,7 @@ export const ProfilePage: React.FC = () => {
       showToast('Profile updated successfully!');
       setIsEditProfileOpen(false);
     } catch (err: any) {
-      showToast(err.response?.data?.message || 'Failed to update profile.');
+      showToast(err.response?.data?.message || 'Failed to update profile.', 'error');
     } finally {
       setEditProfileLoading(false);
     }
@@ -276,7 +279,7 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
-  // Submit new address
+  // Submit new or updated address
   const handleCreateAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!addressForm.recipientName || !addressForm.phone || !addressForm.streetLine) {
@@ -285,16 +288,38 @@ export const ProfilePage: React.FC = () => {
     }
     setAddressLoading(true);
     try {
-      await createAddressApi(addressForm);
-      showToast('New delivery address added!');
-      setIsAddAddressOpen(false);
+      if (isEditAddressOpen && editAddressId) {
+        await updateAddressApi(editAddressId, addressForm);
+        showToast('Delivery address updated!');
+        setIsEditAddressOpen(false);
+      } else {
+        await createAddressApi(addressForm);
+        showToast('New delivery address added!');
+        setIsAddAddressOpen(false);
+      }
+      setEditAddressId(null);
       const updated = await fetchAddressesApi();
       setAddresses(updated);
     } catch (err: any) {
-      showToast(err.response?.data?.message || 'Failed to add address.');
+      showToast(err.response?.data?.message || 'Failed to save address.', 'error');
     } finally {
       setAddressLoading(false);
     }
+  };
+
+  const handleOpenEditAddress = (addr: Address) => {
+    setAddressForm({
+      label: addr.label,
+      recipientName: addr.recipientName,
+      phone: addr.phone,
+      province: addr.province,
+      city: addr.city,
+      commune: addr.commune || '',
+      streetLine: addr.streetLine,
+      isDefault: addr.isDefault,
+    });
+    setEditAddressId(addr.id);
+    setIsEditAddressOpen(true);
   };
 
   // Handle set default address
@@ -305,7 +330,7 @@ export const ProfilePage: React.FC = () => {
       const updated = await fetchAddressesApi();
       setAddresses(updated);
     } catch (err) {
-      showToast('Failed to set default address.');
+      showToast('Failed to set default address.', 'error');
     }
   };
 
@@ -317,8 +342,9 @@ export const ProfilePage: React.FC = () => {
       showToast('Address deleted.');
       const updated = await fetchAddressesApi();
       setAddresses(updated);
-    } catch (err) {
-      showToast('Failed to delete address.');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Failed to delete address.';
+      showToast(msg, 'error');
     }
   };
 
@@ -375,9 +401,19 @@ export const ProfilePage: React.FC = () => {
 
             {/* Notification Toast */}
             {toast && (
-              <div className="fixed top-24 right-6 z-50 bg-[#1c1f2a] border border-[#4edea3] text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce">
-                <span className="material-symbols-outlined text-[#4edea3]">check_circle</span>
-                <span className="text-sm font-medium">{toast}</span>
+              <div
+                className={`fixed top-24 right-6 z-50 bg-[#1c1f2a] border px-4 py-3 max-w-md rounded-md shadow-2xl flex items-start gap-3 animate-bounce ${
+                  toast.type === 'error' ? 'border-[#ff6b6b] text-white' : 'border-[#4edea3] text-white'
+                }`}
+              >
+                <span
+                  className={`material-symbols-outlined shrink-0 mt-0.5 ${
+                    toast.type === 'error' ? 'text-[#ff6b6b]' : 'text-[#4edea3]'
+                  }`}
+                >
+                  {toast.type === 'error' ? 'error' : 'check_circle'}
+                </span>
+                <span className="text-sm font-medium leading-snug">{toast.message}</span>
               </div>
             )}
 
@@ -735,6 +771,14 @@ export const ProfilePage: React.FC = () => {
                                   <span className="text-[#464554]">•</span>
                                 </>
                               )}
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditAddress(addr)}
+                                className="text-[#4cd7f6] hover:underline"
+                              >
+                                Edit
+                              </button>
+                              <span className="text-[#464554]">•</span>
                               <button
                                 type="button"
                                 onClick={() => handleDeleteAddress(addr.id)}
@@ -1388,15 +1432,17 @@ export const ProfilePage: React.FC = () => {
         </div>
       )}
 
-      {/* Add New Address Modal */}
-      {isAddAddressOpen && (
+      {/* Add / Edit Address Modal */}
+      {(isAddAddressOpen || isEditAddressOpen) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="bg-[#1c1f2a] border border-[#262a35] w-full max-w-lg rounded-2xl p-6 shadow-2xl flex flex-col gap-5 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="font-outfit font-bold text-lg text-white">Add Delivery Address</h3>
+              <h3 className="font-outfit font-bold text-lg text-white">
+                {isEditAddressOpen ? 'Edit Delivery Address' : 'Add Delivery Address'}
+              </h3>
               <button
                 type="button"
-                onClick={() => setIsAddAddressOpen(false)}
+                onClick={() => { setIsAddAddressOpen(false); setIsEditAddressOpen(false); }}
                 className="text-[#908fa0] hover:text-white"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -1501,7 +1547,7 @@ export const ProfilePage: React.FC = () => {
               <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setIsAddAddressOpen(false)}
+                  onClick={() => { setIsAddAddressOpen(false); setIsEditAddressOpen(false); }}
                   className="px-4 py-2 rounded-lg text-xs font-semibold text-[#c7c4d7] hover:bg-[#262a35]"
                 >
                   Cancel
@@ -1511,7 +1557,7 @@ export const ProfilePage: React.FC = () => {
                   disabled={addressLoading}
                   className="px-5 py-2 rounded-lg bg-[#8083ff] text-white text-xs font-semibold shadow-md hover:brightness-110 disabled:opacity-50"
                 >
-                  {addressLoading ? 'Adding...' : 'Add Address'}
+                  {addressLoading ? 'Saving...' : 'Save Address'}
                 </button>
               </div>
             </form>

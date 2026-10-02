@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../../features/products/types/product.types';
 import { MobileAppBar } from '../../components/layout/MobileAppBar';
+import { useWishlist } from '../../features/wishlist/context/WishlistContext';
 
 interface MobileProductDetailPageProps {
   product: Product;
@@ -10,7 +11,7 @@ interface MobileProductDetailPageProps {
 
 export const MobileProductDetailPage: React.FC<MobileProductDetailPageProps> = ({ product, onAddToCart }) => {
   const navigate = useNavigate();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { toggleWishlist, isWishlisted } = useWishlist();
 
   const primaryImage = product.images?.find((img) => img.isPrimary)?.imageUrl || product.images?.[0]?.imageUrl || 'https://placehold.co/600x600?text=No+Image';
 
@@ -20,11 +21,11 @@ export const MobileProductDetailPage: React.FC<MobileProductDetailPageProps> = (
         title="Product Details"
         showBackButton
         rightAction={
-          <button onClick={() => setIsFavorite(!isFavorite)} className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all">
-            <span className="material-symbols-outlined text-[24px]">
-              {isFavorite ? 'favorite' : 'favorite_border'}
+          <button onClick={() => toggleWishlist(product.id)} className={`relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all ${isWishlisted(product.id) ? 'text-error' : 'text-outline hover:text-error'}`}>
+            <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: isWishlisted(product.id) ? '"FILL" 1' : '"FILL" 0' }}>
+              favorite
             </span>
-            {!isFavorite && (
+            {!isWishlisted(product.id) && (
               <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface"></span>
             )}
           </button>

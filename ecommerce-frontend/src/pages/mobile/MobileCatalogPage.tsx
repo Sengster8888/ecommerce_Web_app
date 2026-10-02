@@ -6,11 +6,13 @@ import { parsePrice } from '../../utils/price.utils';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import type { Product } from '../../features/products/types/product.types';
 import { MobileBottomNav } from '../../components/layout/MobileBottomNav';
+import { useWishlist } from '../../features/wishlist/context/WishlistContext';
 
 const MobileCatalogPage: React.FC = () => {
   const navigate = useNavigate();
   const { categories } = useCategories();
   const { user } = useAuth();
+  const { toggleWishlist, isWishlisted } = useWishlist();
   
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -213,8 +215,8 @@ const MobileCatalogPage: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <button aria-label="Favorite" className="absolute top-space-2xs right-space-2xs w-7 h-7 rounded-full bg-surface-container-lowest/70 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-error active:scale-90 transition-all">
-                      <span className="material-symbols-outlined text-[16px]">favorite</span>
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product.id); }} aria-label="Favorite" className={`absolute top-space-2xs right-space-2xs w-7 h-7 rounded-full bg-surface-container-lowest/70 backdrop-blur-md flex items-center justify-center hover:text-error active:scale-90 transition-all ${isWishlisted(product.id) ? 'text-error' : 'text-on-surface-variant'}`}>
+                      <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: isWishlisted(product.id) ? '"FILL" 1' : '"FILL" 0' }}>favorite</span>
                     </button>
                   </div>
                   

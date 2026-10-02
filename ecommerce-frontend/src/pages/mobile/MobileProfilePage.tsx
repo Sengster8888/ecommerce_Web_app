@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { updateProfileApi } from '../../features/auth/api/auth.api';
 import { getMeStatsApi } from '../../features/auth/api/auth.api';
@@ -18,7 +18,7 @@ import { submitProductRatingApi } from '../../features/reviews/api/reviews.api';
 import { MobileBottomNav } from '../../components/layout/MobileBottomNav';
 
 export const MobileProfilePage: React.FC = () => {
-  const [, _setNavigate] = useState<any>(null); // To avoid unused navigate if it's unused, wait, actually just remove it.
+  const navigate = useNavigate();
 
   const { user, logout, refreshProfile } = useAuth();
 
@@ -371,6 +371,19 @@ export const MobileProfilePage: React.FC = () => {
 
           {activeTab === 'profile' && (
             <>
+              {/* Quick Links */}
+              <div className="rounded-xl bg-surface-container p-space-xs shadow-md mb-space-sm">
+                <button onClick={() => navigate('/wishlist')} className="w-full flex items-center justify-between p-space-sm hover:bg-surface-container-high active:bg-surface-container-highest rounded-lg transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-error-container/20 flex items-center justify-center text-error">
+                      <span className="material-symbols-outlined text-[20px]">favorite</span>
+                    </div>
+                    <h3 className="font-headline-sm text-headline-sm text-on-surface">My Wishlist</h3>
+                  </div>
+                  <span className="material-symbols-outlined text-[20px] text-on-surface-variant">chevron_right</span>
+                </button>
+              </div>
+
               {/* Section A: Personal Information */}
               <div className="rounded-xl bg-surface-container p-space-md shadow-md space-y-space-sm">
                 <div className="flex items-center justify-between">

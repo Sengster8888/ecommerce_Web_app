@@ -237,7 +237,7 @@ export class PaymentsService {
       } catch (err) {}
       
       try {
-        this.invoicesService.generateAndUploadInvoice(payment.orderId);
+        this.invoicesService.createInvoiceForOrder(payment.orderId);
       } catch (err) {}
     }
 

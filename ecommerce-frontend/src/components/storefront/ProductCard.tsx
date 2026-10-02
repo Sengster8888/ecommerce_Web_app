@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { Product } from '../../features/products/types/product.types';
 import { parsePrice } from '../../utils/price.utils';
+import { useWishlist } from '../../features/wishlist/context/WishlistContext';
 
 interface ProductCardProps {
   product: Product;
@@ -14,6 +15,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onQuickView,
   onAddToCart,
 }) => {
+  const { toggleWishlist, isWishlisted } = useWishlist();
   const priceNum = parsePrice(product.price);
 
   const primaryImage =
@@ -46,6 +48,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {isInStock ? (product.stock <= 3 ? `Only ${product.stock} Left` : 'In Stock') : 'Out of Stock'}
         </span>
 
+        {/* Favorite / Wishlist Toggle */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleWishlist(product.id);
+          }}
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full bg-surface-container-highest/90 backdrop-blur-sm flex items-center justify-center transition-colors shadow-md z-10 hover:scale-110 active:scale-95 ${
+            isWishlisted(product.id) ? 'text-error hover:text-error' : 'text-outline hover:text-error'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: isWishlisted(product.id) ? '"FILL" 1' : '"FILL" 0' }}>
+            favorite
+          </span>
+        </button>
 
         {/* Quick Details Trigger Button */}
         <button

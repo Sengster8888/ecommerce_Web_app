@@ -36,6 +36,7 @@ export const ENDPOINTS = {
     DETAIL: (id: string) => `/orders/${id}`,
     TRACKING: (id: string) => `/orders/${id}/tracking`,
     CANCEL: (id: string) => `/orders/${id}/cancel`,
+    DOWNLOAD_INVOICE: (id: string) => `/orders/${id}/invoice/pdf`,
   },
   ADDRESSES: {
     LIST: '/addresses',

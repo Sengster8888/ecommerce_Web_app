@@ -44,10 +44,20 @@ const ProfileRouteWrapper = () => {
   const isMobile = useIsMobile();
   return isMobile ? <MobileProfilePage /> : <ProfilePage />;
 };
+
+import CollectionPage from '../pages/CollectionPage';
+import MobileCollectionPage from '../pages/mobile/MobileCollectionPage';
+
+const CollectionsRouteWrapper = () => {
+  const isMobile = useIsMobile();
+  return isMobile ? <MobileCollectionPage /> : <CollectionPage />;
+};
+
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import WishlistPage from '../pages/WishlistPage';
 import { ProtectedRoute } from './ProtectedRoute';
 
 export const AppRoutes: React.FC = () => {
@@ -57,7 +67,13 @@ export const AppRoutes: React.FC = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/collections" element={<CollectionsRouteWrapper />} />
       <Route path="/products" element={<ProductsRouteWrapper />} />
+      <Route path="/wishlist" element={
+        <ProtectedRoute>
+          <WishlistPage />
+        </ProtectedRoute>
+      } />
       <Route path="/shop" element={<ShopPage />} />
 
       <Route path="/products/:id" element={<ProductDetailPage />} />

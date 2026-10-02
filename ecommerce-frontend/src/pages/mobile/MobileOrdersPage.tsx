@@ -4,6 +4,7 @@ import {
   fetchMyOrdersApi,
   fetchOrderDetailsApi,
   fetchOrderTrackingTimelineApi,
+  downloadInvoicePdf,
   type OrderDetail,
   type TrackingTimelineEvent,
 } from '../../features/orders/api/orders.api';
@@ -26,6 +27,7 @@ export const MobileOrdersPage: React.FC = () => {
   // Chat sheet state
   const [isChatSheetOpen, setIsChatSheetOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
 
   const showToast = (text: string) => {
     setToastMessage(text);
@@ -93,6 +95,19 @@ export const MobileOrdersPage: React.FC = () => {
       const finalOrder = details || found;
       setSelectedOrder(finalOrder);
       await loadTrackingTimeline(finalOrder.id);
+    }
+  };
+
+  const handleDownloadInvoice = async (orderId: string | number) => {
+    setIsDownloadingInvoice(true);
+    try {
+      await downloadInvoicePdf(orderId);
+      showToast('Invoice downloaded successfully');
+    } catch (err) {
+      console.error('Failed to download invoice:', err);
+      showToast('Failed to download invoice');
+    } finally {
+      setIsDownloadingInvoice(false);
     }
   };
 
@@ -453,18 +468,16 @@ export const MobileOrdersPage: React.FC = () => {
 
               {/* Invoice Download Action */}
               <button 
-                onClick={() => selectedOrder.invoiceUrl ? window.open(selectedOrder.invoiceUrl, '_blank') : null}
-                disabled={!selectedOrder.invoiceUrl}
-                className={`w-full h-12 font-label-lg text-label-lg rounded-xl flex items-center justify-center gap-2 transition-all mb-space-md border ${
-                  selectedOrder.invoiceUrl 
-                    ? 'bg-primary/10 text-primary hover:bg-primary/20 border-primary/20' 
-                    : 'bg-surface-container-highest text-on-surface-variant opacity-70 cursor-not-allowed border-transparent'
-                }`}
+                onClick={() => handleDownloadInvoice(selectedOrder.id)}
+                disabled={isDownloadingInvoice}
+                className="w-full h-12 font-label-lg text-label-lg rounded-xl flex items-center justify-center gap-2 transition-all mb-space-md border bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  {selectedOrder.invoiceUrl ? 'receipt' : 'hourglass_empty'}
-                </span>
-                <span>{selectedOrder.invoiceUrl ? 'Download Invoice' : 'Invoice Unavailable'}</span>
+                {isDownloadingInvoice ? (
+                  <span className="material-symbols-outlined text-[20px] animate-spin">progress_activity</span>
+                ) : (
+                  <span className="material-symbols-outlined text-[20px]">receipt</span>
+                )}
+                <span>{isDownloadingInvoice ? 'Generating PDF...' : 'Download Invoice PDF'}</span>
               </button>
 
               {/* Telegram Support Hotline Card */}

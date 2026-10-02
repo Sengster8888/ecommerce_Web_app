@@ -7,7 +7,7 @@ const navItems = [
   { id: 'home', label: 'Home', icon: 'home', path: '/' },
   { id: 'products', label: 'Catalog', icon: 'grid_view', path: '/products' },
   { id: 'cart', label: 'Cart', icon: 'shopping_bag', path: '/cart' },
-  { id: 'orders', label: 'Orders', icon: 'receipt_long', path: '/orders' },
+  { id: 'orders', label: 'Orders', icon: 'local_shipping', path: '/orders' },
   { id: 'profile', label: 'Profile', icon: 'person', path: '/profile' },
 ];
 
@@ -23,7 +23,7 @@ export const MobileBottomNav: React.FC = () => {
         if (cart && cart.items) {
           setCartCount(cart.items.reduce((acc: number, item: any) => acc + item.quantity, 0));
         }
-      } catch (err) {}
+      } catch (err) { }
     };
     loadCart();
   }, [location.pathname]); // Refresh cart when navigating
@@ -32,8 +32,8 @@ export const MobileBottomNav: React.FC = () => {
     <nav className="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-low/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.7)] md:hidden">
       <div className="flex justify-around items-center h-16 px-space-xs">
         {navItems.map((item) => {
-          const isActive = item.path === '/' 
-            ? location.pathname === '/' 
+          const isActive = item.path === '/'
+            ? location.pathname === '/'
             : location.pathname.startsWith(item.path);
 
           return (
@@ -44,18 +44,17 @@ export const MobileBottomNav: React.FC = () => {
                 e.preventDefault();
                 navigate(item.path);
               }}
-              className={`relative flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl transition-all duration-200 group ${
-                isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'
-              }`}
+              className={`relative flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl transition-all duration-200 group ${isActive ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'
+                }`}
             >
               <div className="relative flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-                <motion.span 
+                <motion.span
                   whileTap={{ scale: 0.85 }}
                   className="material-symbols-outlined text-[22px] z-10"
                 >
                   {item.icon}
                 </motion.span>
-                
+
                 {/* Active Indicator */}
                 {isActive && (
                   <motion.div

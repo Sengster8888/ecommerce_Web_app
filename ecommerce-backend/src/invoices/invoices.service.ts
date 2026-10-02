@@ -1,16 +1,14 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import PDFDocument from 'pdfkit';
 
 @Injectable()
 export class InvoicesService {
-  private readonly logger = new Logger(InvoicesService.name);
+  constructor(private prisma: PrismaService) {}
 
-  constructor(private readonly prisma: PrismaService) {}
-
-  async createInvoiceForOrder(orderId: bigint) {
+  async createInvoiceForOrder(orderId: number) {
     const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: BigInt(orderId) },
     });
 
     if (!order) {
@@ -20,11 +18,11 @@ export class InvoicesService {
     const invoiceNumber = `INV-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${orderId.toString().padStart(4, '0')}`;
 
     const invoice = await this.prisma.invoice.upsert({
-      where: { orderId: orderId },
+      where: { orderId: BigInt(orderId) },
       update: {},
       create: {
         invoiceNumber,
-        orderId: orderId,
+        orderId: BigInt(orderId),
         status: 'PAID',
       }
     });
@@ -32,9 +30,9 @@ export class InvoicesService {
     return invoice;
   }
 
-  async generateInvoicePdf(orderId: bigint): Promise<PDFKit.PDFDocument> {
+  async generateInvoicePdf(orderId: number): Promise<PDFKit.PDFDocument> {
     const invoice = await this.prisma.invoice.findUnique({
-      where: { orderId: orderId },
+      where: { orderId: BigInt(orderId) },
       include: {
         order: {
           include: {
@@ -70,11 +68,11 @@ export class InvoicesService {
     doc
       .fillColor('#0f172a')
       .fontSize(20)
-      .text('INVOICE', 350, 45, { width: 200, align: 'right' })
+      .text('INVOICE', 400, 45, { align: 'right' })
       .fontSize(10)
-      .text(`Invoice Number: ${invoice.invoiceNumber}`, 350, 75, { width: 200, align: 'right' })
-      .text(`Date: ${invoice.issuedAt.toLocaleDateString()}`, 350, 90, { width: 200, align: 'right' })
-      .text(`Status: ${invoice.status}`, 350, 105, { width: 200, align: 'right' });
+      .text(`Invoice Number: ${invoice.invoiceNumber}`, 400, 75, { align: 'right' })
+      .text(`Date: ${invoice.issuedAt.toLocaleDateString()}`, 400, 90, { align: 'right' })
+      .text(`Status: ${invoice.status}`, 400, 105, { align: 'right' });
 
     // Customer Details
     doc
@@ -83,9 +81,9 @@ export class InvoicesService {
       .text('Billed To:', 50, 150)
       .fontSize(10)
       .fillColor('#475569')
-      .text(order.address?.recipientName || order.user?.name || 'Customer', 50, 170)
-      .text(order.address?.phone || '', 50, 185)
-      .text(`${order.address?.streetLine || ''}, ${order.address?.commune ? order.address.commune + ', ' : ''}${order.address?.city || ''}, ${order.address?.province || ''}`, 50, 200, { width: 250 });
+      .text(order.address.recipientName, 50, 170)
+      .text(order.address.phone, 50, 185)
+      .text(`${order.address.streetLine}, ${order.address.commune ? order.address.commune + ', ' : ''}${order.address.city}, ${order.address.province}`, 50, 200, { width: 250 });
 
     // Table Header
     const tableTop = 260;
@@ -93,9 +91,9 @@ export class InvoicesService {
       .fillColor('#1e293b')
       .fontSize(10)
       .text('Item Description', 50, tableTop)
-      .text('Unit Price', 280, tableTop, { width: 80, align: 'right' })
-      .text('Qty', 370, tableTop, { width: 50, align: 'right' })
-      .text('Total', 430, tableTop, { width: 120, align: 'right' });
+      .text('Unit Price', 300, tableTop, { align: 'right' })
+      .text('Qty', 400, tableTop, { align: 'right' })
+      .text('Total', 500, tableTop, { align: 'right' });
 
     doc
       .moveTo(50, tableTop + 15)
@@ -105,19 +103,17 @@ export class InvoicesService {
 
     // Table Rows
     let yPosition = tableTop + 25;
-    if (order.items) {
-      order.items.forEach(item => {
-        doc
-          .fillColor('#475569')
-          .fontSize(10)
-          .text(item.productNameSnapshot, 50, yPosition, { width: 220 })
-          .text(`$${Number(item.unitPrice).toFixed(2)}`, 280, yPosition, { width: 80, align: 'right' })
-          .text(item.quantity.toString(), 370, yPosition, { width: 50, align: 'right' })
-          .text(`$${Number(item.lineTotal).toFixed(2)}`, 430, yPosition, { width: 120, align: 'right' });
+    order.items.forEach(item => {
+      doc
+        .fillColor('#475569')
+        .fontSize(10)
+        .text(item.productNameSnapshot, 50, yPosition, { width: 240 })
+        .text(`$${Number(item.unitPrice).toFixed(2)}`, 300, yPosition, { align: 'right' })
+        .text(item.quantity.toString(), 400, yPosition, { align: 'right' })
+        .text(`$${Number(item.lineTotal).toFixed(2)}`, 500, yPosition, { align: 'right' });
 
-        yPosition += 25;
-      });
-    }
+      yPosition += 25;
+    });
 
     doc
       .moveTo(50, yPosition + 10)
@@ -129,18 +125,18 @@ export class InvoicesService {
     yPosition += 25;
     doc
       .fillColor('#475569')
-      .text('Subtotal:', 340, yPosition, { width: 90, align: 'right' })
-      .text(`$${Number(order.subtotal).toFixed(2)}`, 430, yPosition, { width: 120, align: 'right' });
+      .text('Subtotal:', 400, yPosition, { align: 'right' })
+      .text(`$${Number(order.subtotal).toFixed(2)}`, 500, yPosition, { align: 'right' });
 
     yPosition += 20;
     doc
-      .text('Discount:', 340, yPosition, { width: 90, align: 'right' })
-      .text(`-$${Number(order.discountAmount).toFixed(2)}`, 430, yPosition, { width: 120, align: 'right' });
+      .text('Discount:', 400, yPosition, { align: 'right' })
+      .text(`-$${Number(order.discountAmount).toFixed(2)}`, 500, yPosition, { align: 'right' });
 
     yPosition += 20;
     doc
-      .text('Shipping:', 340, yPosition, { width: 90, align: 'right' })
-      .text(`$${Number(order.shippingFee).toFixed(2)}`, 430, yPosition, { width: 120, align: 'right' });
+      .text('Shipping:', 400, yPosition, { align: 'right' })
+      .text(`$${Number(order.shippingFee).toFixed(2)}`, 500, yPosition, { align: 'right' });
 
     yPosition += 20;
     doc
@@ -151,8 +147,8 @@ export class InvoicesService {
     doc
       .fillColor('#0f172a')
       .fontSize(12)
-      .text('Grand Total:', 310, yPosition, { width: 120, align: 'right' })
-      .text(`$${Number(order.totalAmount).toFixed(2)}`, 430, yPosition, { width: 120, align: 'right' });
+      .text('Grand Total:', 350, yPosition, { align: 'right' })
+      .text(`$${Number(order.totalAmount).toFixed(2)}`, 500, yPosition, { align: 'right' });
 
     // Footer
     doc

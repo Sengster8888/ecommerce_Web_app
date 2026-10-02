@@ -6,6 +6,7 @@ import {
   fetchMyOrdersApi,
   fetchOrderDetailsApi,
   fetchOrderTrackingTimelineApi,
+  downloadInvoicePdf,
   type OrderDetail,
   type TrackingTimelineEvent,
 } from '../features/orders/api/orders.api';
@@ -22,6 +23,7 @@ export const OrdersPage: React.FC = () => {
   const [trackingTimeline, setTrackingTimeline] = useState<TrackingTimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [isItemsExpanded, setIsItemsExpanded] = useState(false);
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
   // Load tracking timeline from GET /api/orders/:id/tracking
   const loadTrackingTimeline = async (orderId: string | number) => {
     try {
@@ -79,6 +81,17 @@ export const OrdersPage: React.FC = () => {
       const finalOrder = details || found;
       setSelectedOrder(finalOrder);
       await loadTrackingTimeline(finalOrder.id);
+    }
+  };
+
+  const handleDownloadInvoice = async (orderId: string | number) => {
+    setIsDownloadingInvoice(true);
+    try {
+      await downloadInvoicePdf(orderId);
+    } catch (err) {
+      console.error('Failed to download invoice:', err);
+    } finally {
+      setIsDownloadingInvoice(false);
     }
   };
 
@@ -518,21 +531,19 @@ export const OrdersPage: React.FC = () => {
                   <span className="material-symbols-outlined text-[32px] text-primary">receipt_long</span>
                   <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">Official Invoice</h3>
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    {selectedOrder.invoiceUrl ? 'Download the official invoice image for this order.' : 'Invoice is not available for this past order.'}
+                    Download the official invoice PDF for this order.
                   </p>
                   <button
-                    onClick={() => selectedOrder.invoiceUrl ? window.open(selectedOrder.invoiceUrl, '_blank') : null}
-                    disabled={!selectedOrder.invoiceUrl}
-                    className={`mt-space-xs h-11 px-space-md w-full rounded-xl font-label-md text-label-md font-bold flex items-center justify-center gap-space-2xs transition-all border ${
-                      selectedOrder.invoiceUrl
-                        ? 'bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 cursor-pointer'
-                        : 'bg-surface-container-highest text-on-surface-variant opacity-70 cursor-not-allowed border-transparent'
-                    }`}
+                    onClick={() => handleDownloadInvoice(selectedOrder.id)}
+                    disabled={isDownloadingInvoice}
+                    className="mt-space-xs h-11 px-space-md w-full rounded-xl font-label-md text-label-md font-bold flex items-center justify-center gap-space-2xs transition-all border bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    <span className="material-symbols-outlined text-[18px]">
-                      {selectedOrder.invoiceUrl ? 'download' : 'hourglass_empty'}
-                    </span>
-                    <span>{selectedOrder.invoiceUrl ? 'Download Invoice' : 'Unavailable'}</span>
+                    {isDownloadingInvoice ? (
+                      <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
+                    ) : (
+                      <span className="material-symbols-outlined text-[18px]">download</span>
+                    )}
+                    <span>{isDownloadingInvoice ? 'Generating PDF...' : 'Download Invoice PDF'}</span>
                   </button>
                 </div>
 

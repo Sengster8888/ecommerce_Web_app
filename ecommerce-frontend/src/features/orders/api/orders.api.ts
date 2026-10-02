@@ -145,3 +145,18 @@ export const fetchOrderTrackingTimelineApi = async (
 };
 
 
+
+export const downloadInvoicePdf = async (orderId: string | number) => {
+  const response = await apiClient.get(ENDPOINTS.ORDERS.DOWNLOAD_INVOICE(orderId.toString()), {
+    responseType: 'blob',
+  });
+  
+  const url = window.URL.createObjectURL(new Blob([response.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', "invoice-.pdf");
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode?.removeChild(link);
+};
+

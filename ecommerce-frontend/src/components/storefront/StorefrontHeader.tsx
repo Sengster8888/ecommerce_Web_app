@@ -97,8 +97,18 @@ export const StorefrontHeader: React.FC<StorefrontHeaderProps> = ({
           </div>
         </div>
 
-        {/* Location & Cart & User Account */}
+        {/* Location & Wishlist & Cart & User Account */}
         <div className="flex items-center gap-3 shrink-0">
+
+          <Link
+            to="/wishlist"
+            className="flex items-center justify-center w-[38px] h-[38px] sm:w-[42px] sm:h-[42px] rounded-xl bg-[#1c1f2a] border border-rose-500/20 hover:border-rose-500/40 text-slate-100 transition-all shadow-[0_0_12px_rgba(244,63,94,0.1)] group"
+            title="My Favorites"
+          >
+            <span className="material-symbols-outlined text-rose-400 group-hover:scale-110 transition-transform text-[20px]">
+              favorite
+            </span>
+          </Link>
 
           <Link
             to="/cart"

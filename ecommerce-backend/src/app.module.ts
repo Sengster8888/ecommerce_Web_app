@@ -17,6 +17,7 @@ import { OrderTrackingModule } from './order-tracking/order-tracking.module.js';
 import { DiscountsModule } from './discounts/discounts.module.js';
 import { ReviewsModule } from './reviews/reviews.module.js';
 import { AddressesModule } from './addresses/addresses.module.js';
+import { WishlistsModule } from './wishlists/wishlists.module.js';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AddressesModule } from './addresses/addresses.module.js';
     DiscountsModule,
     ReviewsModule,
     AddressesModule,
+    WishlistsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

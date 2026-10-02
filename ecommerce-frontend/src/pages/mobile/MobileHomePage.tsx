@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useCategories, usePopularProducts, useDiscountedProducts, useProducts } from '../../features/products/hooks/useProducts';
 import { fetchCart, addToCartApi } from '../../features/cart/api/cart.api';
 import { parsePrice } from '../../utils/price.utils';
@@ -8,13 +8,15 @@ import { useAuth } from '../../features/auth/hooks/useAuth';
 import type { Product } from '../../features/products/types/product.types';
 import { MobileBottomNav } from '../../components/layout/MobileBottomNav';
 import { MobileAppBar } from '../../components/layout/MobileAppBar';
+import { useWishlist } from '../../features/wishlist/context/WishlistContext';
 
 export const MobileHomePage: React.FC = () => {
   const navigate = useNavigate();
   const { categories } = useCategories();
+  const { toggleWishlist, isWishlisted } = useWishlist();
   const { products: popularProducts, loading: loadingPopular } = usePopularProducts(10);
   const { products: discountedProducts, loading: loadingDiscounted } = useDiscountedProducts(10);
-  const { products, loading: loadingProducts, total: totalProducts, setParams } = useProducts({ page: 1, limit: 16 });
+  const { products, loading: loadingProducts, total: totalProducts, setParams } = useProducts({ page: 1, limit: 6 });
   const { user } = useAuth();
 
   const [, setCartCount] = useState(0);
@@ -191,7 +193,7 @@ export const MobileHomePage: React.FC = () => {
                     <span>{countdown.hours}:{countdown.minutes}:{countdown.seconds}</span>
                   </div>
                 </div>
-                <a className="font-label-sm text-label-sm text-secondary font-semibold hover:underline" href="#">See All →</a>
+                <Link to="/collections?collection=discounted" className="font-label-sm text-label-sm text-secondary font-semibold hover:underline">See All →</Link>
               </div>
               
               <div className="flex gap-space-sm overflow-x-auto no-scrollbar py-1 -mx-container-padding-mobile px-container-padding-mobile">
@@ -243,10 +245,7 @@ export const MobileHomePage: React.FC = () => {
                     Curated for tech lovers & creators
                   </p>
                 </div>
-                <button className="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm flex items-center gap-1">
-                  <span>Popular</span>
-                  <span className="material-symbols-outlined text-[14px]">tune</span>
-                </button>
+                <Link to="/collections?collection=trending" className="font-label-sm text-label-sm text-secondary font-semibold hover:underline">See All →</Link>
               </div>
               
               <div className="flex gap-space-sm overflow-x-auto no-scrollbar py-1 -mx-container-padding-mobile px-container-padding-mobile">
@@ -258,8 +257,8 @@ export const MobileHomePage: React.FC = () => {
                 <div key={p.id} className="w-44 flex-shrink-0 p-3 rounded-xl bg-surface-container flex flex-col justify-between space-y-2 shadow-md hover:shadow-xl transition-all relative cursor-pointer" onClick={() => navigate(`/products/${p.id}`)}>
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-surface-container-lowest">
                     <img className="w-full h-full object-cover" alt={p.name} src={p.images?.[0]?.imageUrl || "https://placehold.co/400?text=Product"} />
-                    <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-high/80 backdrop-blur-sm text-outline hover:text-error flex items-center justify-center transition-colors">
-                      <span className="material-symbols-outlined text-[16px]">favorite</span>
+                    <button onClick={(e) => { e.stopPropagation(); toggleWishlist(p.id); }} className={`absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-high/80 backdrop-blur-sm flex items-center justify-center transition-colors ${isWishlisted(p.id) ? 'text-error' : 'text-outline hover:text-error'}`}>
+                      <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: isWishlisted(p.id) ? '"FILL" 1' : '"FILL" 0' }}>favorite</span>
                     </button>
                   </div>
                   <div className="space-y-1">
@@ -315,6 +314,7 @@ export const MobileHomePage: React.FC = () => {
                   {totalProducts || 0} items found
                 </p>
               </div>
+              <Link to="/products" className="font-label-sm text-label-sm text-secondary font-semibold hover:underline">See All →</Link>
             </div>
             
             <div className="grid grid-cols-2 gap-space-sm">
@@ -331,8 +331,8 @@ export const MobileHomePage: React.FC = () => {
                 <div key={p.id} className="p-3 rounded-xl bg-surface-container flex flex-col justify-between space-y-2 shadow-md hover:shadow-xl transition-all relative cursor-pointer" onClick={() => navigate(`/products/${p.id}`)}>
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-surface-container-lowest">
                     <img className="w-full h-full object-cover" alt={p.name} src={p.images?.[0]?.imageUrl || "https://placehold.co/400?text=Product"} />
-                    <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-high/80 backdrop-blur-sm text-outline hover:text-error flex items-center justify-center transition-colors">
-                      <span className="material-symbols-outlined text-[16px]">favorite</span>
+                    <button onClick={(e) => { e.stopPropagation(); toggleWishlist(p.id); }} className={`absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-high/80 backdrop-blur-sm flex items-center justify-center transition-colors ${isWishlisted(p.id) ? 'text-error' : 'text-outline hover:text-error'}`}>
+                      <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: isWishlisted(p.id) ? '"FILL" 1' : '"FILL" 0' }}>favorite</span>
                     </button>
                   </div>
                   <div className="space-y-1">

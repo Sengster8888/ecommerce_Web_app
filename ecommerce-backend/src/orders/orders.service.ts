@@ -198,7 +198,7 @@ export class OrdersService {
     try {
       if (newOrder.paymentMethod === PaymentMethod.COD) {
         this.telegramService.sendNewOrderNotification(newOrder.id);
-        this.invoicesService.generateAndUploadInvoice(newOrder.id);
+        this.invoicesService.createInvoiceForOrder(newOrder.id);
       }
     } catch (error: any) {
       this.logger.error(`Telegram notification failed to trigger: ${error.message}`);

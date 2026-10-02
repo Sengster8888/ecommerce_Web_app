@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { useOrderDetail } from '../../features/orders/hooks/useOrderDetail';
+import { downloadInvoicePdf } from '../../features/orders/api/orders.api';
 import CenterQRImage from '../../assets/image.png';
 
 const MobileOrderDetailPage: React.FC = () => {
@@ -19,6 +20,7 @@ const MobileOrderDetailPage: React.FC = () => {
   } = useOrderDetail(id);
 
   const [toastMessage, setToastMessage] = useState<{ message: string; icon: string } | null>(null);
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
 
   useEffect(() => {
     if (copiedText) {
@@ -39,6 +41,20 @@ const MobileOrderDetailPage: React.FC = () => {
   const handleDeepLink = () => {
     setToastMessage({ message: 'Switching to Bakong Mobile...', icon: 'rocket_launch' });
     setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleDownloadInvoice = async () => {
+    if (!order) return;
+    setIsDownloadingInvoice(true);
+    try {
+      await downloadInvoicePdf(order.id);
+      setToastMessage({ message: 'Invoice Downloaded Successfully', icon: 'download_done' });
+    } catch (err) {
+      setToastMessage({ message: 'Failed to download invoice', icon: 'error' });
+    } finally {
+      setIsDownloadingInvoice(false);
+      setTimeout(() => setToastMessage(null), 2500);
+    }
   };
 
   if (loading) {
@@ -83,9 +99,31 @@ const MobileOrderDetailPage: React.FC = () => {
           <p className="text-on-surface-variant text-center max-w-sm mb-8 mx-auto">
             Order <span className="font-bold text-secondary">{orderNumDisplay}</span> is being processed for dispatch.
           </p>
-          <button onClick={() => navigate('/orders')} className="w-full max-w-xs mx-auto h-12 bg-primary text-on-primary rounded-xl font-bold shadow-lg">
-            View All Orders
-          </button>
+          <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
+            {isPaid && (
+              <button 
+                onClick={handleDownloadInvoice} 
+                disabled={isDownloadingInvoice}
+                className="w-full h-12 bg-surface-container-high text-on-surface rounded-xl font-bold shadow-md flex items-center justify-center gap-2 border border-outline-variant disabled:opacity-70 transition-all hover:bg-surface-container-highest"
+              >
+                {isDownloadingInvoice ? (
+                  <span className="material-symbols-outlined text-[20px] animate-spin">progress_activity</span>
+                ) : (
+                  <span className="material-symbols-outlined text-[20px] text-tertiary">receipt_long</span>
+                )}
+                {isDownloadingInvoice ? 'Generating PDF...' : 'Download Invoice PDF'}
+              </button>
+            )}
+            <button onClick={() => navigate('/orders')} className="w-full h-12 bg-primary text-on-primary rounded-xl font-bold shadow-lg flex items-center justify-center">
+              View All Orders
+            </button>
+          </div>
+          
+          {/* Toast Notification */}
+          <div className={`fixed bottom-12 left-1/2 -translate-x-1/2 w-max bg-surface-bright text-on-surface px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 pointer-events-none transition-opacity duration-300 z-50 ${toastMessage ? 'opacity-100' : 'opacity-0'}`}>
+            <span className="material-symbols-outlined text-[18px] text-tertiary">{toastMessage?.icon || 'check_circle'}</span>
+            <span className="font-label-md text-label-md font-medium">{toastMessage?.message}</span>
+          </div>
         </main>
       </div>
     );

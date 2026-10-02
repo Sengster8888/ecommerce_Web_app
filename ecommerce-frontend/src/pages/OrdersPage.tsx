@@ -513,6 +513,29 @@ export const OrdersPage: React.FC = () => {
 
               {/* Right Column (5 cols): Support Tools */}
               <div className="lg:col-span-5 space-y-space-xl">
+                {/* Invoice Action Card */}
+                <div className="rounded-xl bg-surface-container p-space-lg shadow-xl border border-white/5 flex flex-col gap-space-sm items-center justify-center text-center">
+                  <span className="material-symbols-outlined text-[32px] text-primary">receipt_long</span>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold">Official Invoice</h3>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    {selectedOrder.invoiceUrl ? 'Download the official invoice image for this order.' : 'Invoice is not available for this past order.'}
+                  </p>
+                  <button
+                    onClick={() => selectedOrder.invoiceUrl ? window.open(selectedOrder.invoiceUrl, '_blank') : null}
+                    disabled={!selectedOrder.invoiceUrl}
+                    className={`mt-space-xs h-11 px-space-md w-full rounded-xl font-label-md text-label-md font-bold flex items-center justify-center gap-space-2xs transition-all border ${
+                      selectedOrder.invoiceUrl
+                        ? 'bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 cursor-pointer'
+                        : 'bg-surface-container-highest text-on-surface-variant opacity-70 cursor-not-allowed border-transparent'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {selectedOrder.invoiceUrl ? 'download' : 'hourglass_empty'}
+                    </span>
+                    <span>{selectedOrder.invoiceUrl ? 'Download Invoice' : 'Unavailable'}</span>
+                  </button>
+                </div>
+
                 {/* Customer Help & Support */}
                 <div className="rounded-xl bg-surface-container p-space-lg shadow-xl space-y-space-md border border-white/5">
                   <div className="flex items-center justify-between">

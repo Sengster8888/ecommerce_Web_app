@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCheckout } from '../../features/checkout/hooks/useCheckout';
 import { parsePrice } from '../../utils/price.utils';
 
+import { MobileAppBar } from '../../components/layout/MobileAppBar';
+
 export const MobileCheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const {
@@ -41,21 +43,17 @@ export const MobileCheckoutPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface flex flex-col">
-      {/* Header */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-surface-container-lowest/80 backdrop-blur-xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.5)] pt-safe">
-        <div className="h-16 px-container-padding-mobile flex items-center justify-between">
-          <div className="flex items-center gap-space-xs">
-            <button onClick={() => navigate('/cart')} className="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all rounded-full">
-              <span className="material-symbols-outlined">arrow_back</span>
-            </button>
-            <span className="font-headline-sm text-headline-sm tracking-tight text-on-surface ml-space-2xs">Shopping Cart</span>
-          </div>
+      <MobileAppBar
+        title="Shopping Cart"
+        showBackButton
+        onBack={() => navigate('/cart')}
+        rightAction={
           <div className="flex items-center gap-space-xs text-primary">
             <span className="material-symbols-outlined">shopping_bag</span>
             <span className="font-label-sm font-bold">{totalCount}</span>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <main className="flex flex-col relative w-full pt-16 pb-24 bg-surface flex-1">
         <div className="flex flex-col w-full relative">

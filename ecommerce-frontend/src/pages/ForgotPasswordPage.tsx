@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ForgotPasswordForm } from '../features/auth/components/ForgotPasswordForm';
 
 export const ForgotPasswordPage: React.FC = () => {
-  const [lang, setLang] = useState<'EN' | 'KH'>('EN');
+  
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
@@ -18,12 +18,11 @@ export const ForgotPasswordPage: React.FC = () => {
         <div className="h-16 max-w-7xl mx-auto px-4 md:px-6 lg:px-8 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-lg bg-primary-container/20 border border-primary/30 flex items-center justify-center group-hover:bg-primary-container/30 transition-colors">
-                <span className="material-symbols-outlined text-primary text-[22px]">storefront</span>
-              </div>
-              <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight">
-                Kroma Store
-              </span>
+              <img 
+                src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" 
+                alt="Logo" 
+                className="h-32 w-auto object-contain group-hover:scale-105 transition-transform" 
+              />
             </Link>
             <span className="hidden sm:inline-block ml-2 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
             </span>
@@ -44,32 +43,7 @@ export const ForgotPasswordPage: React.FC = () => {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center bg-surface-container-low rounded-xl p-1 border border-white/5 gap-1">
-              <button
-                type="button"
-                onClick={() => setLang('EN')}
-                className={`font-label-sm text-label-sm px-3 py-1 rounded-lg transition-colors cursor-pointer ${
-                  lang === 'EN'
-                    ? 'bg-surface-container-high text-on-surface shadow-sm font-semibold'
-                    : 'text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang('KH')}
-                className={`font-label-sm text-label-sm px-3 py-1 rounded-lg transition-colors cursor-pointer ${
-                  lang === 'KH'
-                    ? 'bg-surface-container-high text-on-surface shadow-sm font-semibold'
-                    : 'text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                KH ភាសាខ្មែរ
-              </button>
-            </div>
-          </div>
+
         </div>
       </header>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { updateProfileApi } from '../../features/auth/api/auth.api';
 import { getMeStatsApi } from '../../features/auth/api/auth.api';
@@ -15,9 +15,11 @@ import {
 import { fetchMyOrdersApi, type OrderDetail } from '../../features/orders/api/orders.api';
 import { fetchCart } from '../../features/cart/api/cart.api';
 import { submitProductRatingApi } from '../../features/reviews/api/reviews.api';
+import { MobileBottomNav } from '../../components/layout/MobileBottomNav';
 
 export const MobileProfilePage: React.FC = () => {
-  const navigate = useNavigate();
+  const [, _setNavigate] = useState<any>(null); // To avoid unused navigate if it's unused, wait, actually just remove it.
+
   const { user, logout, refreshProfile } = useAuth();
 
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'reviews'>('profile');
@@ -30,7 +32,7 @@ export const MobileProfilePage: React.FC = () => {
     pendingReviews: 0,
     savedLocationsCount: 0,
   });
-  const [cartCount, setCartCount] = useState<number>(0);
+  const [, setCartCount] = useState<number>(0);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Address Modals
@@ -257,17 +259,14 @@ export const MobileProfilePage: React.FC = () => {
     }
   };
 
-  const activeOrdersCount = orders.filter((o) =>
-    ['SHIPPED', 'PROCESSING', 'CONFIRMED', 'PENDING'].includes(o.status)
-  ).length;
+  // activeOrdersCount removed as it is unused
 
   return (
     <div className="bg-surface text-on-surface font-body-md min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
       <header className="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.15)]">
         <div className="h-16 px-container-padding-mobile flex items-center justify-between gap-space-sm">
           <div className="flex items-center gap-space-sm min-w-0">
-            <img alt="Brand logo" className="h-8 w-auto object-contain shrink-0" src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" />
-            <h1 className="font-headline-sm text-headline-sm text-on-surface truncate">Profile</h1>
+            <img alt="Brand logo" className="h-24 w-auto object-contain shrink-0" src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" />
           </div>
           <div className="flex items-center gap-space-2xs shrink-0">
             <button aria-label="Logout" onClick={() => logout()} className="w-11 h-11 flex items-center justify-center rounded-full text-error hover:text-error-container transition-colors">
@@ -851,45 +850,7 @@ export const MobileProfilePage: React.FC = () => {
       )}
 
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 w-full z-40 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.7)]">
-        <div className="flex justify-around items-center h-16 px-space-xs">
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">home</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Home</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/products'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">grid_view</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Catalog</span>
-          </a>
-          <a className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/cart'); }}>
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-secondary-container text-on-secondary font-label-sm text-label-sm leading-none flex items-center justify-center font-bold shadow-[0_0_12px_rgba(3,181,211,0.5)]">
-                  {cartCount}
-                </span>
-              )}
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Cart</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/orders'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 0" }}>receipt_long</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Orders</span>
-          </a>
-          <a aria-current="page" className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl transition-all duration-200 group text-primary [&>div]:bg-primary/10 [&>div]:scale-105" href="#">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>person</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Profile</span>
-          </a>
-        </div>
-      </nav>
+      <MobileBottomNav />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Product } from '../../features/products/types/product.types';
+import { MobileAppBar } from '../../components/layout/MobileAppBar';
 
 interface MobileProductDetailPageProps {
   product: Product;
@@ -15,23 +16,22 @@ export const MobileProductDetailPage: React.FC<MobileProductDetailPageProps> = (
 
   return (
     <div className="bg-surface min-h-screen text-on-surface font-sans pb-28">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-5 pt-safe sticky top-0 z-50 bg-surface/90 backdrop-blur-md">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all">
-          <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-        </button>
-        <h1 className="font-semibold text-lg tracking-tight">Product Details</h1>
-        <button onClick={() => setIsFavorite(!isFavorite)} className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all">
-          <span className="material-symbols-outlined text-[24px]">
-            {isFavorite ? 'favorite' : 'favorite_border'}
-          </span>
-          {!isFavorite && (
-            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface"></span>
-          )}
-        </button>
-      </header>
+      <MobileAppBar
+        title="Product Details"
+        showBackButton
+        rightAction={
+          <button onClick={() => setIsFavorite(!isFavorite)} className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all">
+            <span className="material-symbols-outlined text-[24px]">
+              {isFavorite ? 'favorite' : 'favorite_border'}
+            </span>
+            {!isFavorite && (
+              <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface"></span>
+            )}
+          </button>
+        }
+      />
 
-      <main className="px-5 mt-2">
+      <main className="px-5 mt-2 pt-16">
         {/* Product Image Card */}
         <div className="relative w-full aspect-[4/3] bg-surface-container-lowest rounded-3xl overflow-visible mb-6 flex items-center justify-center shadow-sm">
           <img src={primaryImage} alt={product.name} className="w-3/4 h-3/4 object-contain drop-shadow-xl" />

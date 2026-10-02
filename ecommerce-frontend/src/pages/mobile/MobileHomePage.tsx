@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCategories, usePopularProducts, useDiscountedProducts, useProducts } from '../../features/products/hooks/useProducts';
 import { fetchCart, addToCartApi } from '../../features/cart/api/cart.api';
@@ -6,6 +6,8 @@ import { parsePrice } from '../../utils/price.utils';
 import { ToastNotification } from '../../components/storefront/ToastNotification';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import type { Product } from '../../features/products/types/product.types';
+import { MobileBottomNav } from '../../components/layout/MobileBottomNav';
+import { MobileAppBar } from '../../components/layout/MobileAppBar';
 
 export const MobileHomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ export const MobileHomePage: React.FC = () => {
   const { products, loading: loadingProducts, total: totalProducts, setParams } = useProducts({ page: 1, limit: 16 });
   const { user } = useAuth();
 
-  const [cartCount, setCartCount] = useState(0);
+  const [, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -106,63 +108,61 @@ export const MobileHomePage: React.FC = () => {
   return (
     <div className="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen selection:bg-primary selection:text-on-primary">
       {/* HEADER */}
-      <header className="fixed top-0 inset-x-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.5)] pt-safe">
-        <div className="h-16 px-container-padding-mobile flex items-center justify-between">
-          {isSearchVisible ? (
-            <div className="flex items-center w-full gap-space-xs">
-              <div className="relative flex items-center flex-1 h-10">
-                <div className="absolute left-3 flex items-center pointer-events-none text-outline-variant">
-                  <span className="material-symbols-outlined text-[20px]">search</span>
-                </div>
-                <input
-                  autoFocus
-                  className="w-full h-full pl-10 pr-10 rounded-full bg-surface-container-high text-on-surface font-body-md text-body-md placeholder:text-outline-variant focus:outline-none transition-all"
-                  placeholder="Search gadgets, headphones, laptops..."
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {searchQuery && (
-                  <button
-                    className="absolute right-3 flex items-center justify-center text-outline-variant hover:text-on-surface active:scale-95"
-                    onClick={() => setSearchQuery('')}
-                  >
-                    <span className="material-symbols-outlined text-[18px]">close</span>
-                  </button>
-                )}
+      <MobileAppBar>
+        {isSearchVisible ? (
+          <div className="flex items-center w-full gap-space-xs">
+            <div className="relative flex items-center flex-1 h-10">
+              <div className="absolute left-3 flex items-center pointer-events-none text-outline-variant">
+                <span className="material-symbols-outlined text-[20px]">search</span>
               </div>
-              <button 
-                className="text-secondary font-label-md shrink-0 active:opacity-70 px-2" 
-                onClick={() => { setIsSearchVisible(false); setSearchQuery(''); }}
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-center gap-space-sm min-w-0 flex-1 cursor-pointer" onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}>
-                <img 
-                  alt="Brand logo" 
-                  className="h-32 w-auto object-contain flex-shrink-0 rounded-md" 
-                  src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" 
-                />
-              </div>
-              <div className="flex items-center gap-space-xs flex-shrink-0">
-                <button aria-label="Search catalog" className="min-w-[48px] min-h-[48px] w-12 h-12 flex items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-all rounded-full" onClick={() => setIsSearchVisible(true)}>
-                  <span className="material-symbols-outlined text-[24px]">search</span>
+              <input
+                autoFocus
+                className="w-full h-full pl-10 pr-10 rounded-full bg-surface-container-high text-on-surface font-body-md text-body-md placeholder:text-outline-variant focus:outline-none transition-all"
+                placeholder="Search gadgets, headphones, laptops..."
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  className="absolute right-3 flex items-center justify-center text-outline-variant hover:text-on-surface active:scale-95"
+                  onClick={() => setSearchQuery('')}
+                >
+                  <span className="material-symbols-outlined text-[18px]">close</span>
                 </button>
-                <div className="pl-space-2xs cursor-pointer flex items-center justify-center" onClick={() => navigate('/profile')}>
-                  <img 
-                    alt="Profile" 
-                    src={user?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || user?.fullName || 'Guest'}`} 
-                    className="w-8 h-8 rounded-full object-cover ring-2 ring-outline-variant/30 bg-surface-container"
-                  />
-                </div>
+              )}
+            </div>
+            <button 
+              className="text-secondary font-label-md shrink-0 active:opacity-70 px-2" 
+              onClick={() => { setIsSearchVisible(false); setSearchQuery(''); }}
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-space-sm min-w-0 flex-1 cursor-pointer" onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}>
+              <img 
+                alt="Brand logo" 
+                className="h-24 w-auto object-contain flex-shrink-0 rounded-md" 
+                src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" 
+              />
+            </div>
+            <div className="flex items-center gap-space-xs flex-shrink-0">
+              <button aria-label="Search catalog" className="min-w-[48px] min-h-[48px] w-12 h-12 flex items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-all rounded-full" onClick={() => setIsSearchVisible(true)}>
+                <span className="material-symbols-outlined text-[24px]">search</span>
+              </button>
+              <div className="pl-space-2xs cursor-pointer flex items-center justify-center" onClick={() => navigate('/profile')}>
+                <img 
+                  alt="Profile" 
+                  src={user?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || user?.fullName || 'Guest'}`} 
+                  className="w-8 h-8 rounded-full object-cover ring-2 ring-outline-variant/30 bg-surface-container"
+                />
               </div>
-            </>
-          )}
-        </div>
-      </header>
+            </div>
+          </>
+        )}
+      </MobileAppBar>
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface">
@@ -379,45 +379,7 @@ export const MobileHomePage: React.FC = () => {
       </main>
 
       {/* BOTTOM NAV */}
-      <nav className="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-low/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.7)]">
-        <div className="flex justify-around items-center h-16 px-space-xs">
-          <a aria-current="page" className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl transition-all duration-200 group text-primary [&>div]:bg-primary/10 [&>div]:scale-105" href="#">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">home</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Home</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/products'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">grid_view</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Catalog</span>
-          </a>
-          <a className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/cart'); }}>
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-secondary-container text-on-secondary font-label-sm text-label-sm leading-none flex items-center justify-center font-bold shadow-[0_0_12px_rgba(3,181,211,0.5)]">
-                  {cartCount}
-                </span>
-              )}
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Cart</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/orders'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">receipt_long</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Orders</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/profile'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">person</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Profile</span>
-          </a>
-        </div>
-      </nav>
+      <MobileBottomNav />
 
       <ToastNotification message={toastMessage} isVisible={isToastVisible} />
     </div>

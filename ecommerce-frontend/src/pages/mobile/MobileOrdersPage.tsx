@@ -10,6 +10,7 @@ import {
 import { parsePrice } from '../../utils/price.utils';
 
 import { fetchCart } from '../../features/cart/api/cart.api';
+import { MobileBottomNav } from '../../components/layout/MobileBottomNav';
 
 export const MobileOrdersPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export const MobileOrdersPage: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
   const [trackingTimeline, setTrackingTimeline] = useState<TrackingTimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cartCount, setCartCount] = useState<number>(0);
+  const [, setCartCount] = useState<number>(0);
 
   // Chat sheet state
   const [isChatSheetOpen, setIsChatSheetOpen] = useState(false);
@@ -133,7 +134,7 @@ export const MobileOrdersPage: React.FC = () => {
         <div className="h-16 px-container-padding-mobile flex items-center justify-between">
           <div className="flex items-center gap-space-xs">
             <img alt="Brand logo" className="h-28 w-auto object-contain" src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" />
-            <span className="font-headline-sm text-headline-sm tracking-tight text-on-surface ml-space-2xs truncate max-w-[120px]">Orders History</span>
+            
           </div>
           {/* <div className="flex items-center gap-space-xs">
             <button aria-label="Search catalog" className="min-w-[48px] min-h-[48px] w-12 h-12 flex items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-all rounded-full" onClick={() => navigate('/shop')}>
@@ -226,7 +227,6 @@ export const MobileOrdersPage: React.FC = () => {
                       <span className="font-headline-sm text-headline-sm text-on-surface">{selectedOrder.status}</span>
                     </div>
                   </div>
-                  <span className="px-space-xs py-1 rounded bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm">VET Express</span>
                 </div>
               </div>
 
@@ -451,6 +451,22 @@ export const MobileOrdersPage: React.FC = () => {
                 })}
               </div>
 
+              {/* Invoice Download Action */}
+              <button 
+                onClick={() => selectedOrder.invoiceUrl ? window.open(selectedOrder.invoiceUrl, '_blank') : null}
+                disabled={!selectedOrder.invoiceUrl}
+                className={`w-full h-12 font-label-lg text-label-lg rounded-xl flex items-center justify-center gap-2 transition-all mb-space-md border ${
+                  selectedOrder.invoiceUrl 
+                    ? 'bg-primary/10 text-primary hover:bg-primary/20 border-primary/20' 
+                    : 'bg-surface-container-highest text-on-surface-variant opacity-70 cursor-not-allowed border-transparent'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  {selectedOrder.invoiceUrl ? 'receipt' : 'hourglass_empty'}
+                </span>
+                <span>{selectedOrder.invoiceUrl ? 'Download Invoice' : 'Invoice Unavailable'}</span>
+              </button>
+
               {/* Telegram Support Hotline Card */}
               <div className="rounded-xl bg-gradient-to-r from-surface-container to-surface-container-high p-space-md shadow-[0_4px_20px_-2px_rgba(0,0,0,0.5)] flex items-center justify-between mb-space-md border border-white/5">
                 <div className="flex items-center gap-space-sm">
@@ -508,45 +524,7 @@ export const MobileOrdersPage: React.FC = () => {
       </div>
 
       {/* BOTTOM NAV */}
-      <nav className="fixed bottom-0 w-full z-40 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.7)]">
-        <div className="flex justify-around items-center h-16 px-space-xs">
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">home</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Home</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/products'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">grid_view</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Catalog</span>
-          </a>
-          <a className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/cart'); }}>
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-secondary-container text-on-secondary font-label-sm text-label-sm leading-none flex items-center justify-center font-bold shadow-[0_0_12px_rgba(3,181,211,0.5)]">
-                  {cartCount}
-                </span>
-              )}
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Cart</span>
-          </a>
-          <a aria-current="page" className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl transition-all duration-200 group text-primary [&>div]:bg-primary/10 [&>div]:scale-105" href="#">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>receipt_long</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Orders</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/profile'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">person</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Profile</span>
-          </a>
-        </div>
-      </nav>
+      <MobileBottomNav />
     </div>
   );
 };

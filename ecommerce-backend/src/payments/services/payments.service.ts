@@ -11,12 +11,14 @@ import { KhqrService } from './khqr.service.js';
 import { SimulateCallbackDto } from '../dto/simulate-callback.dto.js';
 import { TelegramService } from '../../telegram/telegram.service.js';
 import QRCode from 'qrcode';
+import { InvoicesService } from '../../orders/invoices.service.js';
 
 @Injectable()
 export class PaymentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly khqrService: KhqrService,
+    private readonly invoicesService: InvoicesService,
     @Optional() @Inject(TelegramService) private readonly telegramService?: TelegramService,
   ) {}
 
@@ -226,13 +228,17 @@ export class PaymentsService {
       };
     });
 
-    // Async notification for newly confirmed order
-    if (result.orderStatus === 'CONFIRMED' && this.telegramService) {
+    // Async notification for newly confirmed order and invoice generation
+    if (result.orderStatus === 'CONFIRMED') {
       try {
-        this.telegramService.sendNewOrderNotification(payment.orderId);
-      } catch (err) {
-        // Log handled silently
-      }
+        if (this.telegramService) {
+          this.telegramService.sendNewOrderNotification(payment.orderId);
+        }
+      } catch (err) {}
+      
+      try {
+        this.invoicesService.generateAndUploadInvoice(payment.orderId);
+      } catch (err) {}
     }
 
     return result;

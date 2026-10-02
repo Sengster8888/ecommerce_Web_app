@@ -36,6 +36,7 @@ export interface OrderDetail {
   totalAmount: number;
   paymentMethod: string;
   createdAt: string;
+  invoiceUrl?: string;
   address?: OrderAddress;
   items: OrderDetailItem[];
 }

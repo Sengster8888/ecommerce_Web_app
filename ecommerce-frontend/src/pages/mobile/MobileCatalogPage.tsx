@@ -5,6 +5,7 @@ import { fetchCart, addToCartApi } from '../../features/cart/api/cart.api';
 import { parsePrice } from '../../utils/price.utils';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import type { Product } from '../../features/products/types/product.types';
+import { MobileBottomNav } from '../../components/layout/MobileBottomNav';
 
 const MobileCatalogPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const MobileCatalogPage: React.FC = () => {
   
   const { products, loading: loadingProducts, total: totalProducts, setParams } = useProducts({ page: 1, limit: 50 });
 
-  const [cartCount, setCartCount] = useState(0);
+  const [, setCartCount] = useState(0);
   const [toastMessage, setToastMessage] = useState<{title: string; desc: string} | null>(null);
 
   const showToast = (title: string, desc: string) => {
@@ -47,7 +48,7 @@ const MobileCatalogPage: React.FC = () => {
     showToast(`${product.name.split(' ')[0]} added!`, 'Bakong KHQR checkout ready');
   };
 
-  const [countdown, setCountdown] = useState({ hours: '08', minutes: '42', seconds: '17' });
+  const [, setCountdown] = useState({ hours: '08', minutes: '42', seconds: '17' });
 
   // Simulate countdown for banner
   useEffect(() => {
@@ -128,12 +129,9 @@ const MobileCatalogPage: React.FC = () => {
               <div className="flex items-center gap-space-xs">
                 <img 
                   alt="Brand logo" 
-                  className="h-8 w-auto object-contain" 
+                  className="h-24 w-auto object-contain" 
                   src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" 
                 />
-                <span className="font-headline-sm text-headline-sm tracking-tight text-on-surface ml-space-2xs truncate max-w-[120px]">
-                  Product Catalog
-                </span>
               </div>
               <div className="flex items-center gap-space-xs">
                 <button aria-label="Search catalog" className="min-w-[48px] min-h-[48px] w-12 h-12 flex items-center justify-center text-on-surface-variant hover:text-secondary active:scale-95 transition-all rounded-full" onClick={() => setIsSearchVisible(true)}>
@@ -270,45 +268,7 @@ const MobileCatalogPage: React.FC = () => {
       </main>
 
       {/* BOTTOM NAV */}
-      <nav className="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-low/90 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.7)]">
-        <div className="flex justify-around items-center h-16 px-space-xs">
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">home</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Home</span>
-          </a>
-          <a aria-current="page" className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl transition-all duration-200 group text-primary [&>div]:bg-primary/10 [&>div]:scale-105" href="#">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">grid_view</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Catalog</span>
-          </a>
-          <a className="relative flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/cart'); }}>
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">shopping_bag</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-secondary-container text-on-secondary font-label-sm text-label-sm leading-none flex items-center justify-center font-bold shadow-[0_0_12px_rgba(3,181,211,0.5)]">
-                  {cartCount}
-                </span>
-              )}
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Cart</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/orders'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">receipt_long</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Orders</span>
-          </a>
-          <a className="flex flex-col items-center justify-center gap-0.5 w-16 h-14 rounded-xl text-on-surface-variant hover:text-on-surface transition-all duration-200 group" href="#" onClick={(e) => { e.preventDefault(); navigate('/profile'); }}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full transition-transform duration-200">
-              <span className="material-symbols-outlined text-[22px]">person</span>
-            </div>
-            <span className="font-label-sm text-label-sm font-medium tracking-tight">Profile</span>
-          </a>
-        </div>
-      </nav>
+      <MobileBottomNav />
 
     </div>
   );

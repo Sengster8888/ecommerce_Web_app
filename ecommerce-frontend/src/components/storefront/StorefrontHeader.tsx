@@ -35,17 +35,11 @@ export const StorefrontHeader: React.FC<StorefrontHeaderProps> = ({
         {/* Logo and Nav links */}
         <div className="flex items-center gap-6 shrink-0">
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600/30 to-cyan-500/20 border border-indigo-500/40 flex items-center justify-center shadow-[0_0_12px_rgba(99,102,241,0.3)] group-hover:scale-105 transition-transform">
-              <span className="material-symbols-outlined text-cyan-400 text-[22px]">devices</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-outfit font-extrabold text-lg tracking-tight text-white group-hover:text-indigo-400 transition-colors">
-                KHMER<span className="text-cyan-400">STORE</span>
-              </span>
-              <span className="text-[10px] font-semibold text-emerald-400 tracking-widest uppercase">
-                Cambodia
-              </span>
-            </div>
+            <img 
+              src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" 
+              alt="Logo" 
+              className="h-32 w-auto object-contain group-hover:scale-105 transition-transform" 
+            />
           </Link>
 
           <nav className="hidden xl:flex items-center gap-1.5">

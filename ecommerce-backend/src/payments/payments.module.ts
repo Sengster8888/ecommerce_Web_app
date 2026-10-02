@@ -6,8 +6,10 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { AuthModule } from '../auth/auth.module.js';
 import { TelegramModule } from '../telegram/telegram.module.js';
 
+import { OrdersModule } from '../orders/orders.module.js';
+
 @Module({
-  imports: [AuthModule, TelegramModule],
+  imports: [AuthModule, TelegramModule, OrdersModule],
   controllers: [PaymentsController],
   providers: [PaymentsService, KhqrService, PrismaService],
   exports: [PaymentsService, KhqrService],

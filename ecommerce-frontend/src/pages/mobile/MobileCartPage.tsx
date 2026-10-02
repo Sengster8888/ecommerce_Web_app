@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { parsePrice } from '../../utils/price.utils';
+import { MobileAppBar } from '../../components/layout/MobileAppBar';
+
 export interface MobileCartPageProps {
   cartItems: any[];
   loading: boolean;
@@ -46,16 +48,26 @@ export const MobileCartPage: React.FC<MobileCartPageProps> = ({
 
   return (
     <div className="bg-surface min-h-screen text-on-surface font-sans pb-[150px]">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-5 pt-safe sticky top-0 z-50 bg-surface/90 backdrop-blur-md">
-        <h1 className="font-semibold text-lg tracking-tight ">Shopping Bag {totalCount > 0 ? `(${totalCount})` : ''}</h1>
-        <button className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all">
-          <span className="material-symbols-outlined text-[24px]">favorite_border</span>
-          <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface"></span>
-        </button>
-      </header>
+      <MobileAppBar
+        leftAction={
+          <div className="flex items-center gap-space-xs">
+            <img 
+              alt="Brand logo" 
+              className="h-24 w-auto object-contain" 
+              src="https://res.cloudinary.com/twnsqgoa/image/upload/v1790070307/Untitled_design.png" 
+            />
+          </div>
+        }
+        // title={totalCount > 0 ? `(${totalCount})` : ''}
+        rightAction={
+          <button className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 active:scale-95 transition-all">
+            <span className="material-symbols-outlined text-[24px]">favorite_border</span>
+            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface"></span>
+          </button>
+        }
+      />
 
-      <main className="px-5 mt-2">
+      <main className="px-5 mt-2 pt-16">
         {cartItems.length > 0 && (
           <div className="flex justify-between items-center mb-4 px-1">
             <span className="text-sm font-medium text-on-surface-variant">{totalCount} Items</span>

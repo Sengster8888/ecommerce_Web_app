@@ -4,6 +4,7 @@ import { CheckoutDto, PaymentMethod } from './dto/checkout.dto.js';
 import { TelegramService } from '../telegram/telegram.service.js';
 import { DiscountsService } from '../discounts/discounts.service.js';
 import { Decimal } from '@prisma/client/runtime/library';
+import { InvoicesService } from './invoices.service.js';
 
 @Injectable()
 export class OrdersService {
@@ -13,6 +14,7 @@ export class OrdersService {
     private readonly prisma: PrismaService,
     private readonly telegramService: TelegramService,
     private readonly discountsService: DiscountsService,
+    private readonly invoicesService: InvoicesService,
   ) {}
 
   async checkout(userId: string, dto: CheckoutDto) {
@@ -196,6 +198,7 @@ export class OrdersService {
     try {
       if (newOrder.paymentMethod === PaymentMethod.COD) {
         this.telegramService.sendNewOrderNotification(newOrder.id);
+        this.invoicesService.generateAndUploadInvoice(newOrder.id);
       }
     } catch (error: any) {
       this.logger.error(`Telegram notification failed to trigger: ${error.message}`);

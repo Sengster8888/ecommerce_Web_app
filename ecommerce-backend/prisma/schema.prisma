@@ -162,6 +162,7 @@ model Order {
   paymentMethod   String            @map("payment_method") @db.VarChar(20) // 'khqr' or 'cod'
   rejectionReason String?           @map("rejection_reason") @db.VarChar(255)
   discountId      BigInt?           @map("discount_id") @db.BigInt
+  invoiceUrl      String?           @map("invoice_url") @db.VarChar(500)
   createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamp
   updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamp
 
